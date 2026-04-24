@@ -8,7 +8,8 @@ const stages = [
   { to: "/stage3/reflection", label: "3-2. 토론 성찰" },
   { to: "/stage4", label: "4-1. 반대 토론" },
   { to: "/stage4/reflection", label: "4-2. 토론 성찰" },
-  { to: "/stage5", label: "5. 최종 보고서" },
+  { to: "/stage5/reflection", label: "5-1. 최종 성찰" },
+  { to: "/stage5/survey", label: "5-2. 사후 설문" },
 ] as const;
 
 export function StageNav() {
