@@ -9,9 +9,21 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as Stage2RouteImport } from './routes/stage2'
+import { Route as Stage1RouteImport } from './routes/stage1'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as IndexRouteImport } from './routes/index'
 
+const Stage2Route = Stage2RouteImport.update({
+  id: '/stage2',
+  path: '/stage2',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Stage1Route = Stage1RouteImport.update({
+  id: '/stage1',
+  path: '/stage1',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const DashboardRoute = DashboardRouteImport.update({
   id: '/dashboard',
   path: '/dashboard',
@@ -26,31 +38,53 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
+  '/stage1': typeof Stage1Route
+  '/stage2': typeof Stage2Route
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
+  '/stage1': typeof Stage1Route
+  '/stage2': typeof Stage2Route
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
+  '/stage1': typeof Stage1Route
+  '/stage2': typeof Stage2Route
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/dashboard'
+  fullPaths: '/' | '/dashboard' | '/stage1' | '/stage2'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/dashboard'
-  id: '__root__' | '/' | '/dashboard'
+  to: '/' | '/dashboard' | '/stage1' | '/stage2'
+  id: '__root__' | '/' | '/dashboard' | '/stage1' | '/stage2'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   DashboardRoute: typeof DashboardRoute
+  Stage1Route: typeof Stage1Route
+  Stage2Route: typeof Stage2Route
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/stage2': {
+      id: '/stage2'
+      path: '/stage2'
+      fullPath: '/stage2'
+      preLoaderRoute: typeof Stage2RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/stage1': {
+      id: '/stage1'
+      path: '/stage1'
+      fullPath: '/stage1'
+      preLoaderRoute: typeof Stage1RouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/dashboard': {
       id: '/dashboard'
       path: '/dashboard'
@@ -71,6 +105,8 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   DashboardRoute: DashboardRoute,
+  Stage1Route: Stage1Route,
+  Stage2Route: Stage2Route,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
