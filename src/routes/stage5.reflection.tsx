@@ -62,7 +62,7 @@ function Stage5Reflection() {
         <div className="mb-4">
           <h1 className="text-2xl font-bold text-primary">5-1단계 · 최종 성찰 보고서</h1>
           <p className="mt-1 text-sm text-muted-foreground">
-            3·4단계의 토론과 성찰 내용을 종합하여, 본인의 사고가 어떻게 변화했는지 작성해 보세요.
+            두 번의 토론과 두 번의 성찰 내용을 종합하여, 토론의 과정이 어떻게 변화했는지 성찰하고 최종 성찰 보고서를 작성하세요.
           </p>
         </div>
         <div className="grid gap-4 lg:grid-cols-2">
