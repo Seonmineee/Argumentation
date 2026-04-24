@@ -71,9 +71,7 @@ function LoginPage() {
     <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
       <div className="w-full max-w-md">
          <div className="mb-8 text-center space-y-2">
-           <h1 className="text-sm font-semibold text-muted-foreground uppercase tracking-tight">
-             ChatGPT 기반 토론 설계기반연구
-           </h1>
+            <h1 className="text-sm font-semibold text-muted-foreground uppercase tracking-tight">{"\n"}</h1>
            <h1 className="text-3xl font-bold text-primary">ChatGPT 기반 토론 플랫폼</h1>
            <p className="text-sm text-muted-foreground">AI와 함께 토론하고 나의 토론을 성찰하세요.</p>
          </div>
