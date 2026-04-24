@@ -69,43 +69,48 @@ function Stage2() {
           </div>
         </details>
 
-        <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)]">
-          {/* LEFT: research + position */}
-          <div className="space-y-5">
-            <div className="rounded-2xl border bg-card p-5">
+        <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:h-[calc(100vh-12rem)]">
+          {/* LEFT: 두 정리 박스가 우측 높이에 맞춰 균등하게 채움 */}
+          <div className="flex min-h-0 flex-col gap-5">
+            <div className="flex min-h-0 flex-1 flex-col rounded-2xl border bg-card p-5">
               <Label htmlFor="pro" className="text-base font-semibold text-primary">찬성측 관련 정보 정리</Label>
-              <Textarea id="pro" rows={5} value={pro} onChange={(e) => setPro(e.target.value)}
-                placeholder="찬성 측의 주장, 근거, 사례, 통계 등을 자유롭게 정리해 보세요." className="mt-2 min-h-[180px]" />
+              <Textarea
+                id="pro" value={pro} onChange={(e) => setPro(e.target.value)}
+                placeholder="찬성 측의 주장, 근거, 사례, 통계 등을 자유롭게 정리해 보세요."
+                className="mt-2 min-h-0 flex-1 resize-none"
+              />
             </div>
-            <div className="rounded-2xl border bg-card p-5">
+            <div className="flex min-h-0 flex-1 flex-col rounded-2xl border bg-card p-5">
               <Label htmlFor="con" className="text-base font-semibold text-primary">반대측 관련 정보 정리</Label>
-              <Textarea id="con" rows={5} value={con} onChange={(e) => setCon(e.target.value)}
-                placeholder="반대 측의 주장, 근거, 사례, 통계 등을 자유롭게 정리해 보세요." className="mt-2 min-h-[180px]" />
+              <Textarea
+                id="con" value={con} onChange={(e) => setCon(e.target.value)}
+                placeholder="반대 측의 주장, 근거, 사례, 통계 등을 자유롭게 정리해 보세요."
+                className="mt-2 min-h-0 flex-1 resize-none"
+              />
             </div>
-
             <div className="flex justify-between">
               <Button variant="outline" onClick={() => save(false)} disabled={saving}>저장만 하기</Button>
               <Button onClick={() => save(true)} disabled={saving}>저장하고 3단계로</Button>
             </div>
           </div>
 
-          {/* RIGHT: research tools */}
-          <div className="flex flex-col gap-5 lg:sticky lg:top-4 lg:h-[calc(100vh-2rem)]">
-            <div className="flex min-h-[300px] flex-1 flex-col overflow-hidden rounded-2xl border bg-card">
+          {/* RIGHT: AI chat + Google */}
+          <div className="flex min-h-0 flex-col gap-5">
+            <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border bg-card">
               <div className="flex items-center justify-between border-b px-4 py-2">
                 <span className="text-sm font-semibold text-primary">AI 자료 조사 (ChatGPT)</span>
                 <span className="text-[11px] text-muted-foreground">실시간 채팅</span>
               </div>
               <ResearchChat />
             </div>
-            <div className="flex min-h-[300px] flex-1 flex-col overflow-hidden rounded-2xl border bg-card">
+            <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border bg-card">
               <div className="flex items-center justify-between border-b px-4 py-2">
                 <span className="text-sm font-semibold text-primary">Google 검색</span>
-                <a href={`https://www.google.com/search?q=${encodeURIComponent(DEBATE_TOPIC)}`} target="_blank" rel="noreferrer"
+                <a href="https://www.google.com/" target="_blank" rel="noreferrer"
                   className="text-xs text-muted-foreground hover:underline">새 창 열기 ↗</a>
               </div>
               <iframe
-                src={`https://www.google.com/search?igu=1&q=${encodeURIComponent(DEBATE_TOPIC)}`}
+                src="https://www.google.com/webhp?igu=1"
                 title="Google Search"
                 className="h-full w-full flex-1"
               />
