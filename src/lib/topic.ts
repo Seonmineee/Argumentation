@@ -16,6 +16,7 @@ export const SURVEY_SECTION_INFO: Record<string, string> = {
   "논변 역량": "논변 역량(tativeness)은 개인이 논쟁적이거나 사회적으로 논란이 있는 주제에 대해 자신의 입장을 옹호하고, 다른 사람의 입장에 반박하려는 성향을 의미합니다. 설명을 잘 읽으신 후, 토론과 같은 논변적 상호작용 상황에서 본인의 생각과 행동에 가장 가까운 항목에 체크해 주시기 바랍니다.",
   "토론 효능감": "논변 역량(tativeness)은 논쟁이나 논란이 있는 주제에 대해 자신의 관점을 제시·변호·설명하고, 상대의 의견과 쟁점을 다루며, 논쟁 상황에 적극적이고 효과적으로 참여할 수 있는 능력과 태도입니다. ",
   "토론 자신감": "토론 자신감(Argumentation Confidence)란 자신의 주장에 적합한 근거를 탐색·선택·보완하고, 기존 지식과 객관적 사실을 활용하여 의견의 타당성을 논리적으로 설명하고 입증할 수 있다고 믿는 정도이다. 설명을 잘 읽으신 후, 토론과 같은 논변적 상호작용 상황에서 본인의 생각과 행동에 가장 가까운 항목에 체크해 주시기 바랍니다.",
+  "수업 만족도": "ChatGPT 기반 토론 수업에 대한 전반적인 만족도와 의견을 묻는 문항입니다. 솔직하게 답해 주세요.",
 };
 
 export const SURVEY_QUESTIONS: { id: string; text: string; section: string }[] = [
@@ -63,6 +64,23 @@ export const SURVEY_QUESTIONS: { id: string; text: string; section: string }[] =
   { id: "3-8", section: "토론 자신감", text: "나는 내 의견을 객관적인 사실과 비교할 수 있다." },
   { id: "3-9", section: "토론 자신감", text: "나는 내가 모은 근거와 내 의견을 연결지을 수 있다." },
   { id: "3-10", section: "토론 자신감", text: "나는 내 의견의 타당성을 입증할 수 있다." },
+];
+
+// 사후 설문에만 추가되는 수업 만족도 문항 (Likert 7개)
+export const POST_SURVEY_QUESTIONS: { id: string; text: string; section: string }[] = [
+  { id: "4-1", section: "수업 만족도", text: "ChatGPT 기반 토론 수업의 내용에 전반적으로 만족한다." },
+  { id: "4-2", section: "수업 만족도", text: "ChatGPT 기반 토론 수업은 의미 있는 내용으로 구성되었다." },
+  { id: "4-3", section: "수업 만족도", text: "ChatGPT 기반 토론 수업의 내용은 이해하기 쉽게 조직되었다." },
+  { id: "4-4", section: "수업 만족도", text: "ChatGPT 기반 토론 수업은 실제적이고 구체적인 방법으로 진행되었다." },
+  { id: "4-5", section: "수업 만족도", text: "ChatGPT 기반 토론 수업에서 선생님의 설명이 명확하고 이해하기 쉬웠다." },
+  { id: "4-6", section: "수업 만족도", text: "ChatGPT 기반 토론 수업에서 배운 내용을 추후 활용할 수 있을 것으로 생각한다." },
+  { id: "4-7", section: "수업 만족도", text: "ChatGPT 기반 토론 수업에 다시 참여하고 싶다." },
+];
+
+// 사후 설문에만 추가되는 서술형 문항
+export const POST_SURVEY_TEXT_QUESTIONS: { id: string; text: string; section: string }[] = [
+  { id: "4-8", section: "수업 만족도", text: "수업에서 좋았던 점에 대한 의견을 작성해주세요." },
+  { id: "4-9", section: "수업에서 아쉬운 점 혹은 개선할 점에 대한 의견을 작성해주세요.", },
 ];
 
 export const LIKERT_LABELS = ["전혀 그렇지 않다", "그렇지 않다", "보통이다", "그렇다", "매우 그렇다"];
