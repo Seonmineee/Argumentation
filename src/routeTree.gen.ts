@@ -11,13 +11,13 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as Stage5RouteImport } from './routes/stage5'
 import { Route as Stage4RouteImport } from './routes/stage4'
+import { Route as Stage3ReflectionRouteImport } from './routes/stage3-reflection'
 import { Route as Stage3RouteImport } from './routes/stage3'
 import { Route as Stage2RouteImport } from './routes/stage2'
 import { Route as Stage1RouteImport } from './routes/stage1'
 import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as Stage4ReflectionRouteImport } from './routes/stage4.reflection'
-import { Route as Stage3ReflectionRouteImport } from './routes/stage3.reflection'
 
 const Stage5Route = Stage5RouteImport.update({
   id: '/stage5',
@@ -27,6 +27,11 @@ const Stage5Route = Stage5RouteImport.update({
 const Stage4Route = Stage4RouteImport.update({
   id: '/stage4',
   path: '/stage4',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Stage3ReflectionRoute = Stage3ReflectionRouteImport.update({
+  id: '/stage3-reflection',
+  path: '/stage3-reflection',
   getParentRoute: () => rootRouteImport,
 } as any)
 const Stage3Route = Stage3RouteImport.update({
@@ -59,21 +64,16 @@ const Stage4ReflectionRoute = Stage4ReflectionRouteImport.update({
   path: '/reflection',
   getParentRoute: () => Stage4Route,
 } as any)
-const Stage3ReflectionRoute = Stage3ReflectionRouteImport.update({
-  id: '/reflection',
-  path: '/reflection',
-  getParentRoute: () => Stage3Route,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/dashboard': typeof DashboardRoute
   '/stage1': typeof Stage1Route
   '/stage2': typeof Stage2Route
-  '/stage3': typeof Stage3RouteWithChildren
+  '/stage3': typeof Stage3Route
+  '/stage3-reflection': typeof Stage3ReflectionRoute
   '/stage4': typeof Stage4RouteWithChildren
   '/stage5': typeof Stage5Route
-  '/stage3/reflection': typeof Stage3ReflectionRoute
   '/stage4/reflection': typeof Stage4ReflectionRoute
 }
 export interface FileRoutesByTo {
@@ -81,10 +81,10 @@ export interface FileRoutesByTo {
   '/dashboard': typeof DashboardRoute
   '/stage1': typeof Stage1Route
   '/stage2': typeof Stage2Route
-  '/stage3': typeof Stage3RouteWithChildren
+  '/stage3': typeof Stage3Route
+  '/stage3-reflection': typeof Stage3ReflectionRoute
   '/stage4': typeof Stage4RouteWithChildren
   '/stage5': typeof Stage5Route
-  '/stage3/reflection': typeof Stage3ReflectionRoute
   '/stage4/reflection': typeof Stage4ReflectionRoute
 }
 export interface FileRoutesById {
@@ -93,10 +93,10 @@ export interface FileRoutesById {
   '/dashboard': typeof DashboardRoute
   '/stage1': typeof Stage1Route
   '/stage2': typeof Stage2Route
-  '/stage3': typeof Stage3RouteWithChildren
+  '/stage3': typeof Stage3Route
+  '/stage3-reflection': typeof Stage3ReflectionRoute
   '/stage4': typeof Stage4RouteWithChildren
   '/stage5': typeof Stage5Route
-  '/stage3/reflection': typeof Stage3ReflectionRoute
   '/stage4/reflection': typeof Stage4ReflectionRoute
 }
 export interface FileRouteTypes {
@@ -107,9 +107,9 @@ export interface FileRouteTypes {
     | '/stage1'
     | '/stage2'
     | '/stage3'
+    | '/stage3-reflection'
     | '/stage4'
     | '/stage5'
-    | '/stage3/reflection'
     | '/stage4/reflection'
   fileRoutesByTo: FileRoutesByTo
   to:
@@ -118,9 +118,9 @@ export interface FileRouteTypes {
     | '/stage1'
     | '/stage2'
     | '/stage3'
+    | '/stage3-reflection'
     | '/stage4'
     | '/stage5'
-    | '/stage3/reflection'
     | '/stage4/reflection'
   id:
     | '__root__'
@@ -129,9 +129,9 @@ export interface FileRouteTypes {
     | '/stage1'
     | '/stage2'
     | '/stage3'
+    | '/stage3-reflection'
     | '/stage4'
     | '/stage5'
-    | '/stage3/reflection'
     | '/stage4/reflection'
   fileRoutesById: FileRoutesById
 }
@@ -140,7 +140,8 @@ export interface RootRouteChildren {
   DashboardRoute: typeof DashboardRoute
   Stage1Route: typeof Stage1Route
   Stage2Route: typeof Stage2Route
-  Stage3Route: typeof Stage3RouteWithChildren
+  Stage3Route: typeof Stage3Route
+  Stage3ReflectionRoute: typeof Stage3ReflectionRoute
   Stage4Route: typeof Stage4RouteWithChildren
   Stage5Route: typeof Stage5Route
 }
@@ -159,6 +160,13 @@ declare module '@tanstack/react-router' {
       path: '/stage4'
       fullPath: '/stage4'
       preLoaderRoute: typeof Stage4RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/stage3-reflection': {
+      id: '/stage3-reflection'
+      path: '/stage3-reflection'
+      fullPath: '/stage3-reflection'
+      preLoaderRoute: typeof Stage3ReflectionRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/stage3': {
@@ -203,26 +211,8 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Stage4ReflectionRouteImport
       parentRoute: typeof Stage4Route
     }
-    '/stage3/reflection': {
-      id: '/stage3/reflection'
-      path: '/reflection'
-      fullPath: '/stage3/reflection'
-      preLoaderRoute: typeof Stage3ReflectionRouteImport
-      parentRoute: typeof Stage3Route
-    }
   }
 }
-
-interface Stage3RouteChildren {
-  Stage3ReflectionRoute: typeof Stage3ReflectionRoute
-}
-
-const Stage3RouteChildren: Stage3RouteChildren = {
-  Stage3ReflectionRoute: Stage3ReflectionRoute,
-}
-
-const Stage3RouteWithChildren =
-  Stage3Route._addFileChildren(Stage3RouteChildren)
 
 interface Stage4RouteChildren {
   Stage4ReflectionRoute: typeof Stage4ReflectionRoute
@@ -240,10 +230,20 @@ const rootRouteChildren: RootRouteChildren = {
   DashboardRoute: DashboardRoute,
   Stage1Route: Stage1Route,
   Stage2Route: Stage2Route,
-  Stage3Route: Stage3RouteWithChildren,
+  Stage3Route: Stage3Route,
+  Stage3ReflectionRoute: Stage3ReflectionRoute,
   Stage4Route: Stage4RouteWithChildren,
   Stage5Route: Stage5Route,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}
