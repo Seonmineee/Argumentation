@@ -19,7 +19,7 @@ function Stage3Reflection() {
       <StageNav />
       <main className="mx-auto max-w-4xl px-4 py-6">
         <div className="mb-4">
-          <h1 className="text-2xl font-bold text-primary">3단계 · 찬성 토론 성찰</h1>
+          <h1 className="text-2xl font-bold text-primary">3-2단계 · 찬성 토론 성찰</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             성찰 코치 챗봇이 방금 한 토론을 함께 돌아봅니다.
           </p>
