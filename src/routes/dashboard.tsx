@@ -60,7 +60,7 @@ function Dashboard() {
     { to: "/stage2", title: "2단계 · 자료 조사 및 입장 정리", desc: "찬·반 자료를 정리하고 내 주장을 구성합니다.", done: p.research },
     { to: "/stage3", title: "3단계 · 3-1 찬성 토론 / 3-2 토론 성찰", desc: "찬성 토론 후 토론 기록을 보며 성찰 챗봇과 대화하고 메모를 작성합니다.", done: p.debate3Ended && p.reflection3 },
     { to: "/stage4", title: "4단계 · 4-1 반대 토론 / 4-2 토론 성찰", desc: "반대 토론 후 토론 기록을 보며 성찰 챗봇과 대화하고 메모를 작성합니다.", done: p.debate4Ended && p.reflection4 },
-    { to: "/stage5", title: "5단계 · 최종 보고서 + 사후 설문", desc: "모든 토론을 정리하고 사후 설문 진행", done: p.report && p.post },
+    { to: "/stage5/reflection", title: "5단계 · 5-1 최종 성찰 / 5-2 사후 설문", desc: "최종 성찰 보고서를 작성한 뒤 사후 설문을 진행합니다.", done: p.report && p.post },
   ];
 
   return (
