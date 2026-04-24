@@ -1,1 +1,7 @@
 project_id = "yfynpuyxmkbhdjvhdfxa"
+
+[functions.debate-chat]
+verify_jwt = false
+
+[functions.reflection-chat]
+verify_jwt = false
