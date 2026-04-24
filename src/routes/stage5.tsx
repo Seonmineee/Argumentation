@@ -114,7 +114,12 @@ function Stage5() {
             <h1 className="text-2xl font-bold text-primary">사후 설문</h1>
             <p className="mt-2 text-sm text-muted-foreground">사전 설문과 동일한 41문항입니다. 솔직하게 답해 주세요.</p>
             <div className="mt-6">
-              <SurveyForm initial={postInitial} onSubmit={submitPost} submitting={submittingSurvey} />
+              <SurveyForm
+                initial={postInitial}
+                onSubmit={submitPost}
+                submitting={submittingSurvey}
+                onSkip={() => setStep("done")}
+              />
             </div>
           </>
         )}

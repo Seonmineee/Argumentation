@@ -64,7 +64,12 @@ function Stage1() {
             </p>
           )}
         </div>
-        <SurveyForm initial={initial} onSubmit={submit} submitting={submitting} />
+        <SurveyForm
+          initial={initial}
+          onSubmit={submit}
+          submitting={submitting}
+          onSkip={() => navigate({ to: "/stage2" })}
+        />
       </main>
     </div>
   );
