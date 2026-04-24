@@ -113,11 +113,10 @@ export function DebateView({
       await supabase.from("debate_sessions")
         .update({ status: "ended", ended_at: new Date().toISOString() })
         .eq("id", sessionId);
-      await navigate({ to: reflectionHref });
+      navigate({ to: reflectionHref });
     } catch {
-      toast.error("토론 종료 처리 중 오류가 발생했습니다.");
-    } finally {
       setEnding(false);
+      toast.error("토론 종료 처리 중 오류가 발생했습니다.");
     }
   }
 
