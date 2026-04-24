@@ -80,7 +80,7 @@ export const POST_SURVEY_QUESTIONS: { id: string; text: string; section: string 
 // 사후 설문에만 추가되는 서술형 문항
 export const POST_SURVEY_TEXT_QUESTIONS: { id: string; text: string; section: string }[] = [
   { id: "4-8", section: "수업 만족도", text: "수업에서 좋았던 점에 대한 의견을 작성해주세요." },
-  { id: "4-9", section: "수업에서 아쉬운 점 혹은 개선할 점에 대한 의견을 작성해주세요.", },
+  { id: "4-9", section: "수업 만족도", text: "수업에서 아쉬운 점 혹은 개선할 점에 대한 의견을 작성해주세요." },
 ];
 
 export const LIKERT_LABELS = ["전혀 그렇지 않다", "그렇지 않다", "보통이다", "그렇다", "매우 그렇다"];
