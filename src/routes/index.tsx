@@ -20,6 +20,7 @@ function LoginPage() {
   const navigate = useNavigate();
   const [studentNumber, setStudentNumber] = useState("");
   const [phoneLast4, setPhoneLast4] = useState("");
+  const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -32,6 +33,9 @@ function LoginPage() {
     setError(null);
     if (!/^\d+$/.test(studentNumber)) return setError("학번은 숫자만 입력해 주세요.");
     if (!/^\d{4}$/.test(phoneLast4)) return setError("휴대폰 끝 4자리(숫자 4개)를 입력해 주세요.");
+    const trimmedName = name.trim();
+    if (!trimmedName) return setError("이름을 입력해 주세요.");
+    if (trimmedName.length > 50) return setError("이름은 50자 이내로 입력해 주세요.");
     setLoading(true);
     try {
       const { data: existing, error: selErr } = await supabase
@@ -46,11 +50,20 @@ function LoginPage() {
       if (!row) {
         const { data: inserted, error: insErr } = await supabase
           .from("students")
-          .insert({ student_number: studentNumber, phone_last4: phoneLast4 })
+          .insert({ student_number: studentNumber, phone_last4: phoneLast4, name: trimmedName })
           .select()
           .single();
         if (insErr) throw insErr;
         row = inserted;
+      } else if (row.name !== trimmedName) {
+        const { data: updated, error: updErr } = await supabase
+          .from("students")
+          .update({ name: trimmedName })
+          .eq("id", row.id)
+          .select()
+          .single();
+        if (updErr) throw updErr;
+        row = updated;
       }
 
       setStudent({
@@ -77,6 +90,11 @@ function LoginPage() {
         <div className="rounded-2xl border bg-card p-6 shadow-sm">
           <form onSubmit={onSubmit} className="space-y-4">
             <div>
+              <Label htmlFor="nm">이름</Label>
+              <Input id="nm" placeholder="예: 홍길동" maxLength={50}
+                value={name} onChange={(e) => setName(e.target.value)} />
+            </div>
+            <div>
               <Label htmlFor="sn">학번</Label>
               <Input id="sn" inputMode="numeric" placeholder="예: 30215"
                 value={studentNumber} onChange={(e) => setStudentNumber(e.target.value.replace(/\D/g, ""))} />
@@ -92,7 +110,7 @@ function LoginPage() {
             </Button>
           </form>
         </div>
-         <p className="mt-4 text-center text-xs text-muted-foreground">학번 + 휴대폰 끝 4자리를 입력하세요.</p>
+         <p className="mt-4 text-center text-xs text-muted-foreground">이름, 학번, 휴대폰 끝 4자리를 입력하세요.</p>
       </div>
     </div>
   );

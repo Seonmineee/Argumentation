@@ -58,7 +58,7 @@ export function DebateView({
     let acc = "";
     await streamChat({
       url: `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/debate-chat`,
-      body: { messages: history, studentPosition },
+      body: { messages: history, studentPosition, studentName: student.name ?? "" },
       onDelta: (d) => {
         acc += d;
         setMessages((prev) => {
@@ -81,7 +81,7 @@ export function DebateView({
         toast.error(message);
       },
     });
-  }, [studentPosition]);
+  }, [studentPosition, student.name]);
 
   // Auto-greet if no messages
   useEffect(() => {
