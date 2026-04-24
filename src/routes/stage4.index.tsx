@@ -4,7 +4,7 @@ import { useStudent } from "@/lib/student";
 import { StageNav } from "@/components/StageNav";
 import { DebateView } from "@/components/DebateView";
 
-export const Route = createFileRoute("/stage4")({
+export const Route = createFileRoute("/stage4/")({
   component: Stage4,
 });
 
