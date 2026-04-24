@@ -23,7 +23,7 @@ export function DebateSidePanels({ student, stage, side }: Props) {
 
   useEffect(() => {
     (async () => {
-      const [{ data: research }, { data: noteRow }, refl] = await Promise.all([
+      const [researchRes, noteRes, reflRes] = await Promise.all([
         supabase.from("stage2_research").select("pro_arguments,con_arguments")
           .eq("student_id", student.id).maybeSingle(),
         supabase.from("debate_notes").select("content")
@@ -31,13 +31,12 @@ export function DebateSidePanels({ student, stage, side }: Props) {
         stage === 4
           ? supabase.from("reflection_notes").select("content")
               .eq("student_id", student.id).eq("stage", 3).maybeSingle()
-          : Promise.resolve({ data: null }),
+          : Promise.resolve({ data: null as { content: string } | null }),
       ]);
-      setProNotes(research?.pro_arguments ?? "");
-      setConNotes(research?.con_arguments ?? "");
-      if (noteRow?.content) setNewFacts(noteRow.content);
-      // @ts-expect-error mixed promise type above
-      if (refl?.data?.content) setReflection3(refl.data.content);
+      setProNotes(researchRes.data?.pro_arguments ?? "");
+      setConNotes(researchRes.data?.con_arguments ?? "");
+      if (noteRes.data?.content) setNewFacts(noteRes.data.content);
+      if (reflRes.data?.content) setReflection3(reflRes.data.content);
     })();
   }, [student.id, stage]);
 
