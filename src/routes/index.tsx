@@ -10,8 +10,8 @@ import { DEBATE_TOPIC } from "@/lib/topic";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "토론·성찰 학습 플랫폼" },
-      { name: "description", content: "AI와 함께하는 고등학생 토론·성찰 학습" },
+       { title: "ChatGPT 기반 토론 플랫폼" },
+       { name: "description", content: "AI와 함께 토론하고 나의 토론을 성찰하세요." },
     ],
   }),
   component: LoginPage,
@@ -72,10 +72,13 @@ function LoginPage() {
   return (
     <div className="flex min-h-screen items-center justify-center bg-background px-4 py-12">
       <div className="w-full max-w-md">
-        <div className="mb-8 text-center">
-          <h1 className="text-3xl font-bold text-primary">토론·성찰 학습 플랫폼</h1>
-          <p className="mt-3 text-sm text-muted-foreground">AI와 함께하는 5단계 토론 학습</p>
-        </div>
+         <div className="mb-8 text-center space-y-2">
+           <h1 className="text-sm font-semibold text-muted-foreground uppercase tracking-tight">
+             ChatGPT 기반 토론 설계기반연구
+           </h1>
+           <h1 className="text-3xl font-bold text-primary">ChatGPT 기반 토론 플랫폼</h1>
+           <p className="text-sm text-muted-foreground">AI와 함께 토론하고 나의 토론을 성찰하세요.</p>
+         </div>
         <div className="rounded-2xl border bg-card p-6 shadow-sm">
           <p className="mb-4 rounded-lg bg-muted p-3 text-xs leading-relaxed text-muted-foreground">
             <span className="font-semibold text-foreground">오늘의 논제 ·</span> {DEBATE_TOPIC}
@@ -101,9 +104,7 @@ function LoginPage() {
             </Button>
           </form>
         </div>
-        <p className="mt-4 text-center text-xs text-muted-foreground">
-          학번 + 휴대폰 끝 4자리로 본인 학습 기록을 이어갈 수 있어요.
-        </p>
+         <p className="mt-4 text-center text-xs text-muted-foreground">학번 + 휴대폰 끝 4자리를 입력하세요.</p>
       </div>
     </div>
   );
