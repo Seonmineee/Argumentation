@@ -24,7 +24,7 @@ function LoginPage() {
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
-    if (getStudent()) navigate({ to: "/dashboard" });
+    if (getStudent()) navigate({ to: "/stage1" });
   }, [navigate]);
 
   async function onSubmit(e: React.FormEvent) {
@@ -59,7 +59,7 @@ function LoginPage() {
         phone_last4: row.phone_last4,
         name: row.name,
       });
-      navigate({ to: "/dashboard" });
+      navigate({ to: "/stage1" });
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "로그인 중 오류가 발생했습니다.");
     } finally {
