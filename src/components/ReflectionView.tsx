@@ -135,8 +135,6 @@ export function ReflectionView({
     );
   }
 
-  const userTurns = messages.filter((m) => m.role === "user").length;
-
   return (
     <div className="space-y-4">
     <div className="grid gap-4 lg:grid-cols-2">
