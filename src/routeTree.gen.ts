@@ -9,38 +9,186 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as Stage5RouteImport } from './routes/stage5'
+import { Route as Stage4RouteImport } from './routes/stage4'
+import { Route as Stage3RouteImport } from './routes/stage3'
+import { Route as Stage2RouteImport } from './routes/stage2'
+import { Route as Stage1RouteImport } from './routes/stage1'
+import { Route as DashboardRouteImport } from './routes/dashboard'
 import { Route as IndexRouteImport } from './routes/index'
+import { Route as Stage4ReflectionRouteImport } from './routes/stage4.reflection'
+import { Route as Stage3ReflectionRouteImport } from './routes/stage3.reflection'
 
+const Stage5Route = Stage5RouteImport.update({
+  id: '/stage5',
+  path: '/stage5',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Stage4Route = Stage4RouteImport.update({
+  id: '/stage4',
+  path: '/stage4',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Stage3Route = Stage3RouteImport.update({
+  id: '/stage3',
+  path: '/stage3',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Stage2Route = Stage2RouteImport.update({
+  id: '/stage2',
+  path: '/stage2',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Stage1Route = Stage1RouteImport.update({
+  id: '/stage1',
+  path: '/stage1',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DashboardRoute = DashboardRouteImport.update({
+  id: '/dashboard',
+  path: '/dashboard',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const Stage4ReflectionRoute = Stage4ReflectionRouteImport.update({
+  id: '/reflection',
+  path: '/reflection',
+  getParentRoute: () => Stage4Route,
+} as any)
+const Stage3ReflectionRoute = Stage3ReflectionRouteImport.update({
+  id: '/reflection',
+  path: '/reflection',
+  getParentRoute: () => Stage3Route,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/dashboard': typeof DashboardRoute
+  '/stage1': typeof Stage1Route
+  '/stage2': typeof Stage2Route
+  '/stage3': typeof Stage3RouteWithChildren
+  '/stage4': typeof Stage4RouteWithChildren
+  '/stage5': typeof Stage5Route
+  '/stage3/reflection': typeof Stage3ReflectionRoute
+  '/stage4/reflection': typeof Stage4ReflectionRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/dashboard': typeof DashboardRoute
+  '/stage1': typeof Stage1Route
+  '/stage2': typeof Stage2Route
+  '/stage3': typeof Stage3RouteWithChildren
+  '/stage4': typeof Stage4RouteWithChildren
+  '/stage5': typeof Stage5Route
+  '/stage3/reflection': typeof Stage3ReflectionRoute
+  '/stage4/reflection': typeof Stage4ReflectionRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/dashboard': typeof DashboardRoute
+  '/stage1': typeof Stage1Route
+  '/stage2': typeof Stage2Route
+  '/stage3': typeof Stage3RouteWithChildren
+  '/stage4': typeof Stage4RouteWithChildren
+  '/stage5': typeof Stage5Route
+  '/stage3/reflection': typeof Stage3ReflectionRoute
+  '/stage4/reflection': typeof Stage4ReflectionRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/'
+  fullPaths:
+    | '/'
+    | '/dashboard'
+    | '/stage1'
+    | '/stage2'
+    | '/stage3'
+    | '/stage4'
+    | '/stage5'
+    | '/stage3/reflection'
+    | '/stage4/reflection'
   fileRoutesByTo: FileRoutesByTo
-  to: '/'
-  id: '__root__' | '/'
+  to:
+    | '/'
+    | '/dashboard'
+    | '/stage1'
+    | '/stage2'
+    | '/stage3'
+    | '/stage4'
+    | '/stage5'
+    | '/stage3/reflection'
+    | '/stage4/reflection'
+  id:
+    | '__root__'
+    | '/'
+    | '/dashboard'
+    | '/stage1'
+    | '/stage2'
+    | '/stage3'
+    | '/stage4'
+    | '/stage5'
+    | '/stage3/reflection'
+    | '/stage4/reflection'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  DashboardRoute: typeof DashboardRoute
+  Stage1Route: typeof Stage1Route
+  Stage2Route: typeof Stage2Route
+  Stage3Route: typeof Stage3RouteWithChildren
+  Stage4Route: typeof Stage4RouteWithChildren
+  Stage5Route: typeof Stage5Route
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/stage5': {
+      id: '/stage5'
+      path: '/stage5'
+      fullPath: '/stage5'
+      preLoaderRoute: typeof Stage5RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/stage4': {
+      id: '/stage4'
+      path: '/stage4'
+      fullPath: '/stage4'
+      preLoaderRoute: typeof Stage4RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/stage3': {
+      id: '/stage3'
+      path: '/stage3'
+      fullPath: '/stage3'
+      preLoaderRoute: typeof Stage3RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/stage2': {
+      id: '/stage2'
+      path: '/stage2'
+      fullPath: '/stage2'
+      preLoaderRoute: typeof Stage2RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/stage1': {
+      id: '/stage1'
+      path: '/stage1'
+      fullPath: '/stage1'
+      preLoaderRoute: typeof Stage1RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dashboard': {
+      id: '/dashboard'
+      path: '/dashboard'
+      fullPath: '/dashboard'
+      preLoaderRoute: typeof DashboardRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -48,21 +196,54 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/stage4/reflection': {
+      id: '/stage4/reflection'
+      path: '/reflection'
+      fullPath: '/stage4/reflection'
+      preLoaderRoute: typeof Stage4ReflectionRouteImport
+      parentRoute: typeof Stage4Route
+    }
+    '/stage3/reflection': {
+      id: '/stage3/reflection'
+      path: '/reflection'
+      fullPath: '/stage3/reflection'
+      preLoaderRoute: typeof Stage3ReflectionRouteImport
+      parentRoute: typeof Stage3Route
+    }
   }
 }
 
+interface Stage3RouteChildren {
+  Stage3ReflectionRoute: typeof Stage3ReflectionRoute
+}
+
+const Stage3RouteChildren: Stage3RouteChildren = {
+  Stage3ReflectionRoute: Stage3ReflectionRoute,
+}
+
+const Stage3RouteWithChildren =
+  Stage3Route._addFileChildren(Stage3RouteChildren)
+
+interface Stage4RouteChildren {
+  Stage4ReflectionRoute: typeof Stage4ReflectionRoute
+}
+
+const Stage4RouteChildren: Stage4RouteChildren = {
+  Stage4ReflectionRoute: Stage4ReflectionRoute,
+}
+
+const Stage4RouteWithChildren =
+  Stage4Route._addFileChildren(Stage4RouteChildren)
+
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  DashboardRoute: DashboardRoute,
+  Stage1Route: Stage1Route,
+  Stage2Route: Stage2Route,
+  Stage3Route: Stage3RouteWithChildren,
+  Stage4Route: Stage4RouteWithChildren,
+  Stage5Route: Stage5Route,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}
