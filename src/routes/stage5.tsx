@@ -55,7 +55,7 @@ function Stage5() {
     setStep("survey");
   }
 
-  async function submitPost(responses: Record<string, number>) {
+  async function submitPost(responses: Record<string, number>): Promise<void> {
     if (!student) return;
     setSubmittingSurvey(true);
     const { error } = await supabase.from("surveys").upsert(
@@ -63,7 +63,7 @@ function Stage5() {
       { onConflict: "student_id,survey_type" }
     );
     setSubmittingSurvey(false);
-    if (error) return toast.error("제출 실패: " + error.message);
+    if (error) { toast.error("제출 실패: " + error.message); return; }
     toast.success("모든 학습이 완료되었습니다! 수고하셨어요.");
     setStep("done");
   }
