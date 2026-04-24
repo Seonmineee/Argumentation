@@ -14,7 +14,7 @@ export const Route = createFileRoute("/stage5/survey")({
 function Stage5Survey() {
   const student = useStudent();
   const navigate = useNavigate();
-  const [postInitial, setPostInitial] = useState<Record<string, number> | undefined>();
+  const [postInitial, setPostInitial] = useState<Record<string, number | string> | undefined>();
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
 
@@ -25,13 +25,13 @@ function Stage5Survey() {
       const { data } = await supabase.from("surveys").select("responses")
         .eq("student_id", student.id).eq("survey_type", "post").maybeSingle();
       if (data?.responses) {
-        setPostInitial(data.responses as Record<string, number>);
+        setPostInitial(data.responses as Record<string, number | string>);
         setDone(true);
       }
     })();
   }, [student, navigate]);
 
-  async function submit(responses: Record<string, number>) {
+  async function submit(responses: Record<string, number | string>) {
     if (!student) return;
     setSubmitting(true);
     const { error } = await supabase.from("surveys").upsert(
@@ -69,6 +69,7 @@ function Stage5Survey() {
                 onSubmit={submit}
                 submitting={submitting}
                 onSkip={() => setDone(true)}
+                includePostExtras
               />
             </div>
           </>

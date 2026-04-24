@@ -1,28 +1,52 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { SURVEY_QUESTIONS, LIKERT_LABELS, SURVEY_SECTION_INFO } from "@/lib/topic";
+import { Textarea } from "@/components/ui/textarea";
+import {
+  SURVEY_QUESTIONS,
+  LIKERT_LABELS,
+  SURVEY_SECTION_INFO,
+  POST_SURVEY_QUESTIONS,
+  POST_SURVEY_TEXT_QUESTIONS,
+} from "@/lib/topic";
 
 export function SurveyForm({
   initial,
   onSubmit,
   submitting,
   onSkip,
+  includePostExtras = false,
 }: {
-  initial?: Record<string, number>;
-  onSubmit: (responses: Record<string, number>) => Promise<void>;
+  initial?: Record<string, number | string>;
+  onSubmit: (responses: Record<string, number | string>) => Promise<void>;
   submitting?: boolean;
   onSkip?: () => void;
+  includePostExtras?: boolean;
 }) {
-  const [responses, setResponses] = useState<Record<string, number>>(initial ?? {});
+  const [responses, setResponses] = useState<Record<string, number | string>>(initial ?? {});
   const [error, setError] = useState<string | null>(null);
 
-  const sections = Array.from(new Set(SURVEY_QUESTIONS.map((q) => q.section)));
+  const likertQuestions = includePostExtras
+    ? [...SURVEY_QUESTIONS, ...POST_SURVEY_QUESTIONS]
+    : SURVEY_QUESTIONS;
+  const textQuestions = includePostExtras ? POST_SURVEY_TEXT_QUESTIONS : [];
+  const sections = Array.from(
+    new Set([...likertQuestions, ...textQuestions].map((q) => q.section)),
+  );
 
   async function handle() {
-    const missing = SURVEY_QUESTIONS.find((q) => !(q.id in responses));
+    const missing = likertQuestions.find((q) => !(q.id in responses));
     if (missing) {
       setError(`아직 응답하지 않은 문항이 있어요 (${missing.id}).`);
       const el = document.getElementById(`q-${missing.id}`);
+      el?.scrollIntoView({ behavior: "smooth", block: "center" });
+      return;
+    }
+    const missingText = textQuestions.find(
+      (q) => !((responses[q.id] as string | undefined)?.trim?.()),
+    );
+    if (missingText) {
+      setError(`아직 응답하지 않은 문항이 있어요 (${missingText.id}).`);
+      const el = document.getElementById(`q-${missingText.id}`);
       el?.scrollIntoView({ behavior: "smooth", block: "center" });
       return;
     }
@@ -41,7 +65,7 @@ export function SurveyForm({
             </div>
           )}
           <div className="space-y-5">
-            {SURVEY_QUESTIONS.filter((q) => q.section === sec).map((q) => (
+            {likertQuestions.filter((q) => q.section === sec).map((q) => (
               <div key={q.id} id={`q-${q.id}`} className="border-b pb-4 last:border-b-0 last:pb-0">
                 <p className="mb-3 text-sm">
                   <span className="mr-2 font-semibold text-accent">{q.id}.</span>
@@ -68,6 +92,22 @@ export function SurveyForm({
                     );
                   })}
                 </div>
+              </div>
+            ))}
+            {textQuestions.filter((q) => q.section === sec).map((q) => (
+              <div key={q.id} id={`q-${q.id}`} className="border-b pb-4 last:border-b-0 last:pb-0">
+                <p className="mb-3 text-sm">
+                  <span className="mr-2 font-semibold text-accent">{q.id}.</span>
+                  {q.text}
+                </p>
+                <Textarea
+                  rows={4}
+                  value={(responses[q.id] as string) ?? ""}
+                  onChange={(e) =>
+                    setResponses((r) => ({ ...r, [q.id]: e.target.value }))
+                  }
+                  placeholder="자유롭게 작성해 주세요."
+                />
               </div>
             ))}
           </div>

@@ -13,7 +13,7 @@ export const Route = createFileRoute("/stage1")({
 function Stage1() {
   const student = useStudent();
   const navigate = useNavigate();
-  const [initial, setInitial] = useState<Record<string, number> | undefined>();
+  const [initial, setInitial] = useState<Record<string, number | string> | undefined>();
   const [loaded, setLoaded] = useState(false);
   const [submitting, setSubmitting] = useState(false);
   const [done, setDone] = useState(false);
@@ -26,14 +26,14 @@ function Stage1() {
         .from("surveys").select("responses")
         .eq("student_id", student.id).eq("survey_type", "pre").maybeSingle();
       if (data?.responses) {
-        setInitial(data.responses as Record<string, number>);
+        setInitial(data.responses as Record<string, number | string>);
         setDone(true);
       }
       setLoaded(true);
     })();
   }, [student, navigate]);
 
-  async function submit(responses: Record<string, number>) {
+  async function submit(responses: Record<string, number | string>) {
     if (!student) return;
     setSubmitting(true);
     const { error } = await supabase.from("surveys").upsert(
