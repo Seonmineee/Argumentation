@@ -5,6 +5,7 @@ import { streamChat, type ChatMsg } from "@/lib/stream";
 import { ChatPanel } from "@/components/ChatPanel";
 import { Button } from "@/components/ui/button";
 import { ScrollArea } from "@/components/ui/scroll-area";
+import { Textarea } from "@/components/ui/textarea";
 import { toast } from "sonner";
 import type { StudentSession } from "@/lib/student";
 
@@ -27,6 +28,9 @@ export function ReflectionView({
   const [streaming, setStreaming] = useState(false);
   const [loaded, setLoaded] = useState(false);
   const [hasDebate, setHasDebate] = useState(false);
+  const [note, setNote] = useState<string>("");
+  const [savingNote, setSavingNote] = useState(false);
+  const [noteSaved, setNoteSaved] = useState<string>("");
   const initStarted = useRef(false);
 
   useEffect(() => {
@@ -51,6 +55,10 @@ export function ReflectionView({
         .select("role,content").eq("student_id", student.id).eq("stage", stage)
         .order("created_at");
       setMessages((rmsgs ?? []).map((m) => ({ role: m.role as "user" | "assistant", content: m.content })));
+
+      const { data: noteRow } = await supabase.from("reflection_notes")
+        .select("content").eq("student_id", student.id).eq("stage", stage).maybeSingle();
+      if (noteRow?.content) setNote(noteRow.content);
       setLoaded(true);
     })();
   }, [student.id, stage]);
@@ -102,6 +110,21 @@ export function ReflectionView({
     await callAI(next, transcript);
   }
 
+  async function saveNote() {
+    setSavingNote(true);
+    try {
+      const { error } = await supabase.from("reflection_notes").upsert({
+        student_id: student.id, stage, content: note, updated_at: new Date().toISOString(),
+      }, { onConflict: "student_id,stage" });
+      if (error) throw error;
+      setNoteSaved(new Date().toLocaleTimeString());
+    } catch {
+      toast.error("메모 저장 실패");
+    } finally {
+      setSavingNote(false);
+    }
+  }
+
   if (!loaded) return <div className="p-8 text-center text-muted-foreground">불러오는 중...</div>;
 
   if (!hasDebate) {
@@ -115,6 +138,7 @@ export function ReflectionView({
   const userTurns = messages.filter((m) => m.role === "user").length;
 
   return (
+    <div className="space-y-4">
     <div className="grid gap-4 lg:grid-cols-2">
       {/* Left: Debate transcript */}
       <div className="rounded-2xl border bg-card flex flex-col h-[70vh]">
@@ -161,6 +185,32 @@ export function ReflectionView({
           </div>
         }
       />
+    </div>
+
+    {/* Memo panel */}
+    <div className="rounded-2xl border bg-card p-4">
+      <div className="mb-2 flex items-center justify-between gap-2">
+        <div>
+          <h2 className="text-sm font-semibold">나의 성찰 메모</h2>
+          <p className="text-xs text-muted-foreground mt-0.5">
+            토론 기록과 성찰 코치와의 대화를 보면서, 배운 점·개선할 점·다음에 시도할 전략을 자유롭게 적어 보세요.
+          </p>
+        </div>
+        <div className="flex items-center gap-2">
+          {noteSaved && <span className="text-xs text-muted-foreground">저장됨 {noteSaved}</span>}
+          <Button size="sm" onClick={saveNote} disabled={savingNote}>
+            {savingNote ? "저장 중..." : "메모 저장"}
+          </Button>
+        </div>
+      </div>
+      <Textarea
+        value={note}
+        onChange={(e) => setNote(e.target.value)}
+        placeholder="예) 핵심 쟁점 파악에서는 ___이 좋았고, 반박을 위한 질문에서는 ___이 부족했다. 다음에는 ___을 시도하겠다."
+        rows={6}
+        className="resize-y"
+      />
+    </div>
     </div>
   );
 }
