@@ -30,14 +30,18 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
-      { title: "Lovable App" },
-      { name: "description", content: "Lovable Generated Project" },
+      { title: "DebatewithAI" },
+      { name: "description", content: "Argument Architect is an AI-powered platform for high school students to enhance their argumentation skills through simulated debates." },
       { name: "author", content: "Lovable" },
-      { property: "og:title", content: "Lovable App" },
-      { property: "og:description", content: "Lovable Generated Project" },
+      { property: "og:title", content: "DebatewithAI" },
+      { property: "og:description", content: "Argument Architect is an AI-powered platform for high school students to enhance their argumentation skills through simulated debates." },
       { property: "og:type", content: "website" },
       { name: "twitter:card", content: "summary" },
       { name: "twitter:site", content: "@Lovable" },
+      { name: "twitter:title", content: "DebatewithAI" },
+      { name: "twitter:description", content: "Argument Architect is an AI-powered platform for high school students to enhance their argumentation skills through simulated debates." },
+      { property: "og:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/c7902300-71cf-4ca1-8278-14fb612103a6/id-preview-21d7ff4f--e52990ed-b053-4ef1-a059-0a55bfed6816.lovable.app-1777033804006.png" },
+      { name: "twitter:image", content: "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/c7902300-71cf-4ca1-8278-14fb612103a6/id-preview-21d7ff4f--e52990ed-b053-4ef1-a059-0a55bfed6816.lovable.app-1777033804006.png" },
     ],
     links: [
       {
