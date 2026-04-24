@@ -36,7 +36,7 @@ export function SurveyForm({
         <section key={sec} className="rounded-2xl border bg-card p-6">
           <h3 className="mb-4 text-lg font-semibold text-primary">{sec}</h3>
           {SURVEY_SECTION_INFO[sec] && (
-            <div className="mb-5 whitespace-pre-line rounded-lg bg-muted/50 p-4 text-sm leading-relaxed text-muted-foreground">
+            <div className="mb-5 whitespace-pre-line rounded-lg bg-muted/50 p-4 text-sm leading-relaxed text-muted-foreground text-slate-950">
               {SURVEY_SECTION_INFO[sec]}
             </div>
           )}
