@@ -1,15 +1,17 @@
 import { useState } from "react";
 import { Button } from "@/components/ui/button";
-import { SURVEY_QUESTIONS, LIKERT_LABELS } from "@/lib/topic";
+import { SURVEY_QUESTIONS, LIKERT_LABELS, SURVEY_SECTION_INFO } from "@/lib/topic";
 
 export function SurveyForm({
   initial,
   onSubmit,
   submitting,
+  onSkip,
 }: {
   initial?: Record<string, number>;
   onSubmit: (responses: Record<string, number>) => Promise<void>;
   submitting?: boolean;
+  onSkip?: () => void;
 }) {
   const [responses, setResponses] = useState<Record<string, number>>(initial ?? {});
   const [error, setError] = useState<string | null>(null);
@@ -33,6 +35,11 @@ export function SurveyForm({
       {sections.map((sec) => (
         <section key={sec} className="rounded-2xl border bg-card p-6">
           <h3 className="mb-4 text-lg font-semibold text-primary">{sec}</h3>
+          {SURVEY_SECTION_INFO[sec] && (
+            <div className="mb-5 whitespace-pre-line rounded-lg bg-muted/50 p-4 text-sm leading-relaxed text-muted-foreground">
+              {SURVEY_SECTION_INFO[sec]}
+            </div>
+          )}
           <div className="space-y-5">
             {SURVEY_QUESTIONS.filter((q) => q.section === sec).map((q) => (
               <div key={q.id} id={`q-${q.id}`} className="border-b pb-4 last:border-b-0 last:pb-0">
@@ -67,9 +74,14 @@ export function SurveyForm({
         </section>
       ))}
       {error && <p className="text-sm text-destructive">{error}</p>}
-      <div className="flex justify-end">
+      <div className="flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+        {onSkip && (
+          <Button type="button" variant="outline" onClick={onSkip} disabled={submitting}>
+            테스트용: 그냥 넘어가기
+          </Button>
+        )}
         <Button onClick={handle} disabled={submitting}>
-          {submitting ? "제출 중..." : "제출하기"}
+          {submitting ? "저장 중..." : "설문 결과 저장하고 넘어가기"}
         </Button>
       </div>
     </div>
