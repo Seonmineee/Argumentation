@@ -97,7 +97,7 @@ function Stage5Reflection() {
             <div className="border-b px-4 py-3">
               <h2 className="text-sm font-semibold">최종 성찰 보고서</h2>
               <p className="text-xs text-muted-foreground mt-0.5">
-                포함하면 좋아요: ① 두 입장에서 얻은 통찰, ② 가장 강했던/약했던 근거, ③ 인상 깊었던 AI 반박, ④ 나의 최종 입장과 근거.
+                포함하면 좋아요: ① AI와의 토론을 통해 얻은 통찰, ② 토론에서 나의 잘했던 부분 / 못했던 부분, ③ 인상 깊었던 부분
               </p>
             </div>
             <div className="flex-1 p-3">
