@@ -135,13 +135,11 @@ export function ReflectionView({
     );
   }
 
-  const userTurns = messages.filter((m) => m.role === "user").length;
-
   return (
     <div className="space-y-4">
     <div className="grid gap-4 lg:grid-cols-2">
       {/* Left: Debate transcript */}
-      <div className="rounded-2xl border bg-card flex flex-col h-[70vh]">
+      <div className="rounded-2xl border bg-card shadow-sm flex flex-col h-[calc(100vh-180px)]">
         <div className="border-b px-4 py-3">
           <h2 className="text-sm font-semibold">내 토론 기록</h2>
           <p className="text-xs text-muted-foreground mt-0.5">
@@ -177,10 +175,9 @@ export function ReflectionView({
         placeholder="성찰 코치의 질문에 자유롭게 답해 보세요."
         emptyHint="성찰 코치가 첫 질문을 준비하고 있어요..."
         rightSlot={
-          <div className="flex items-center justify-between gap-2 text-xs text-muted-foreground">
-            <span>나의 성찰 답변 {userTurns}회</span>
+          <div className="flex items-center justify-end gap-2 text-xs text-muted-foreground">
             <Link to={nextHref}>
-              <Button size="sm" variant={userTurns >= 3 ? "default" : "outline"}>{nextLabel} →</Button>
+              <Button size="sm">{nextLabel} →</Button>
             </Link>
           </div>
         }
