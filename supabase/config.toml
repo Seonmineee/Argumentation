@@ -5,3 +5,6 @@ verify_jwt = false
 
 [functions.reflection-chat]
 verify_jwt = false
+
+[functions.research-chat]
+verify_jwt = false
