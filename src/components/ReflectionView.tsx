@@ -19,7 +19,7 @@ export function ReflectionView({
   student: StudentSession;
   stage: 3 | 4;
   studentPosition: "pro" | "con";
-  nextHref: "/stage4" | "/stage5";
+  nextHref: "/stage4" | "/stage5/reflection";
   nextLabel: string;
 }) {
   const [messages, setMessages] = useState<ChatMsg[]>([]);

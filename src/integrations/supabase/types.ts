@@ -46,6 +46,38 @@ export type Database = {
           },
         ]
       }
+      debate_notes: {
+        Row: {
+          content: string
+          id: string
+          stage: number
+          student_id: string
+          updated_at: string
+        }
+        Insert: {
+          content?: string
+          id?: string
+          stage: number
+          student_id: string
+          updated_at?: string
+        }
+        Update: {
+          content?: string
+          id?: string
+          stage?: number
+          student_id?: string
+          updated_at?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "debate_notes_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       debate_sessions: {
         Row: {
           created_at: string
