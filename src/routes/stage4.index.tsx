@@ -19,7 +19,7 @@ function Stage4() {
       <StageNav />
       <main className="mx-auto max-w-4xl px-4 py-6">
         <div className="mb-4">
-          <h1 className="text-2xl font-bold text-primary">4단계 · 반대 입장 토론</h1>
+          <h1 className="text-2xl font-bold text-primary">4-1단계 · 반대 입장 토론</h1>
           <p className="mt-1 text-sm text-muted-foreground">
             나는 <span className="font-semibold text-accent">반대</span>, AI는 찬성 입장입니다.
           </p>
