@@ -16,6 +16,8 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as Stage5IndexRouteImport } from './routes/stage5.index'
 import { Route as Stage4IndexRouteImport } from './routes/stage4.index'
 import { Route as Stage3IndexRouteImport } from './routes/stage3.index'
+import { Route as Stage5SurveyRouteImport } from './routes/stage5.survey'
+import { Route as Stage5ReflectionRouteImport } from './routes/stage5.reflection'
 import { Route as Stage4ReflectionRouteImport } from './routes/stage4.reflection'
 import { Route as Stage3ReflectionRouteImport } from './routes/stage3.reflection'
 
@@ -54,6 +56,16 @@ const Stage3IndexRoute = Stage3IndexRouteImport.update({
   path: '/stage3/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const Stage5SurveyRoute = Stage5SurveyRouteImport.update({
+  id: '/stage5/survey',
+  path: '/stage5/survey',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const Stage5ReflectionRoute = Stage5ReflectionRouteImport.update({
+  id: '/stage5/reflection',
+  path: '/stage5/reflection',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const Stage4ReflectionRoute = Stage4ReflectionRouteImport.update({
   id: '/stage4/reflection',
   path: '/stage4/reflection',
@@ -72,6 +84,8 @@ export interface FileRoutesByFullPath {
   '/stage2': typeof Stage2Route
   '/stage3/reflection': typeof Stage3ReflectionRoute
   '/stage4/reflection': typeof Stage4ReflectionRoute
+  '/stage5/reflection': typeof Stage5ReflectionRoute
+  '/stage5/survey': typeof Stage5SurveyRoute
   '/stage3/': typeof Stage3IndexRoute
   '/stage4/': typeof Stage4IndexRoute
   '/stage5/': typeof Stage5IndexRoute
@@ -83,6 +97,8 @@ export interface FileRoutesByTo {
   '/stage2': typeof Stage2Route
   '/stage3/reflection': typeof Stage3ReflectionRoute
   '/stage4/reflection': typeof Stage4ReflectionRoute
+  '/stage5/reflection': typeof Stage5ReflectionRoute
+  '/stage5/survey': typeof Stage5SurveyRoute
   '/stage3': typeof Stage3IndexRoute
   '/stage4': typeof Stage4IndexRoute
   '/stage5': typeof Stage5IndexRoute
@@ -95,6 +111,8 @@ export interface FileRoutesById {
   '/stage2': typeof Stage2Route
   '/stage3/reflection': typeof Stage3ReflectionRoute
   '/stage4/reflection': typeof Stage4ReflectionRoute
+  '/stage5/reflection': typeof Stage5ReflectionRoute
+  '/stage5/survey': typeof Stage5SurveyRoute
   '/stage3/': typeof Stage3IndexRoute
   '/stage4/': typeof Stage4IndexRoute
   '/stage5/': typeof Stage5IndexRoute
@@ -108,6 +126,8 @@ export interface FileRouteTypes {
     | '/stage2'
     | '/stage3/reflection'
     | '/stage4/reflection'
+    | '/stage5/reflection'
+    | '/stage5/survey'
     | '/stage3/'
     | '/stage4/'
     | '/stage5/'
@@ -119,6 +139,8 @@ export interface FileRouteTypes {
     | '/stage2'
     | '/stage3/reflection'
     | '/stage4/reflection'
+    | '/stage5/reflection'
+    | '/stage5/survey'
     | '/stage3'
     | '/stage4'
     | '/stage5'
@@ -130,6 +152,8 @@ export interface FileRouteTypes {
     | '/stage2'
     | '/stage3/reflection'
     | '/stage4/reflection'
+    | '/stage5/reflection'
+    | '/stage5/survey'
     | '/stage3/'
     | '/stage4/'
     | '/stage5/'
@@ -142,6 +166,8 @@ export interface RootRouteChildren {
   Stage2Route: typeof Stage2Route
   Stage3ReflectionRoute: typeof Stage3ReflectionRoute
   Stage4ReflectionRoute: typeof Stage4ReflectionRoute
+  Stage5ReflectionRoute: typeof Stage5ReflectionRoute
+  Stage5SurveyRoute: typeof Stage5SurveyRoute
   Stage3IndexRoute: typeof Stage3IndexRoute
   Stage4IndexRoute: typeof Stage4IndexRoute
   Stage5IndexRoute: typeof Stage5IndexRoute
@@ -198,6 +224,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof Stage3IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/stage5/survey': {
+      id: '/stage5/survey'
+      path: '/stage5/survey'
+      fullPath: '/stage5/survey'
+      preLoaderRoute: typeof Stage5SurveyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/stage5/reflection': {
+      id: '/stage5/reflection'
+      path: '/stage5/reflection'
+      fullPath: '/stage5/reflection'
+      preLoaderRoute: typeof Stage5ReflectionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/stage4/reflection': {
       id: '/stage4/reflection'
       path: '/stage4/reflection'
@@ -222,6 +262,8 @@ const rootRouteChildren: RootRouteChildren = {
   Stage2Route: Stage2Route,
   Stage3ReflectionRoute: Stage3ReflectionRoute,
   Stage4ReflectionRoute: Stage4ReflectionRoute,
+  Stage5ReflectionRoute: Stage5ReflectionRoute,
+  Stage5SurveyRoute: Stage5SurveyRoute,
   Stage3IndexRoute: Stage3IndexRoute,
   Stage4IndexRoute: Stage4IndexRoute,
   Stage5IndexRoute: Stage5IndexRoute,
