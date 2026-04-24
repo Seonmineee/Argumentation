@@ -125,16 +125,21 @@ Acknowledge the opponent's point but present a counterargument:
 Summarize their main argument. Refute it with logic or evidence.
 Restate your stance clearly. Remember to maintain logical consistency and adapt your stance based on the flow of argument. Use transitions such as "in conclusion", "ultimately", or "to sum up" when summarizing.`;
 
-function systemPrompt(studentPosition: "pro" | "con") {
+function systemPrompt(studentPosition: "pro" | "con", studentName: string) {
   // Student pro → AI against lowering. Student con → AI for lowering.
-  return studentPosition === "pro" ? PROMPT_AI_AGAINST : PROMPT_AI_FOR;
+  const base = studentPosition === "pro" ? PROMPT_AI_AGAINST : PROMPT_AI_FOR;
+  const safeName = (studentName ?? "").trim();
+  const greetingRule = safeName
+    ? `\n\n### Student Greeting (MANDATORY)\nThe student's name is "${safeName}". On your VERY FIRST message only, you MUST begin with "${safeName} 님 안녕하세요~ " and then immediately continue with the mandatory opening sentence: "교육감 선거권 연령을 16세로 낮추는 것이 청소년의 정치 참여와 교육 민주주의 강화에 도움이 될까요, 아니면 아직 적용하기에 이르다고 생각하시나요? 함께 의견을 나눠볼까요?" Do not add any other small talk. Do not repeat the greeting in subsequent messages.`
+    : "";
+  return base + greetingRule;
 }
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { messages, studentPosition } = await req.json();
+    const { messages, studentPosition, studentName } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not set");
 
@@ -147,7 +152,7 @@ Deno.serve(async (req) => {
       body: JSON.stringify({
         model: "google/gemini-3-flash-preview",
         messages: [
-          { role: "system", content: systemPrompt(studentPosition) },
+          { role: "system", content: systemPrompt(studentPosition, studentName ?? "") },
           ...messages,
         ],
         stream: true,
