@@ -1,5 +1,5 @@
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Link } from "@tanstack/react-router";
+import { useNavigate } from "@tanstack/react-router";
 import { supabase } from "@/integrations/supabase/client";
 import { streamChat, type ChatMsg } from "@/lib/stream";
 import { ChatPanel } from "@/components/ChatPanel";
@@ -18,10 +18,12 @@ export function DebateView({
   studentPosition: "pro" | "con";
   reflectionHref: "/stage3/reflection" | "/stage4/reflection";
 }) {
+  const navigate = useNavigate();
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [messages, setMessages] = useState<ChatMsg[]>([]);
   const [streaming, setStreaming] = useState(false);
   const [loaded, setLoaded] = useState(false);
+  const [ending, setEnding] = useState(false);
   const initStarted = useRef(false);
 
   const userTurns = messages.filter((m) => m.role === "user").length;
@@ -104,6 +106,20 @@ export function DebateView({
     await callAI(next, sessionId);
   }
 
+  async function endDebate() {
+    if (!sessionId || ending) return;
+    setEnding(true);
+    try {
+      await supabase.from("debate_sessions")
+        .update({ status: "ended", ended_at: new Date().toISOString() })
+        .eq("id", sessionId);
+      navigate({ to: reflectionHref });
+    } catch {
+      toast.error("토론 종료 처리 중 오류가 발생했습니다.");
+      setEnding(false);
+    }
+  }
+
   if (!loaded) return <div className="p-8 text-center text-muted-foreground">불러오는 중...</div>;
 
   return (
@@ -115,9 +131,13 @@ export function DebateView({
       rightSlot={
         <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
           <span>나의 발언 {userTurns}회</span>
-          <Link to={reflectionHref}>
-            <Button size="sm" variant="outline">성찰 단계로 →</Button>
-          </Link>
+          <Button
+            size="sm"
+            onClick={endDebate}
+            disabled={ending || streaming || userTurns === 0}
+          >
+            {ending ? "이동 중..." : "토론 종료 후 성찰로 →"}
+          </Button>
         </div>
       }
     />
