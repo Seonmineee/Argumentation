@@ -58,8 +58,8 @@ function Dashboard() {
   const items = [
     { to: "/stage1", title: "1단계 · 사전 설문", desc: "토론 전 자기 진단(41문항)", done: p.pre },
     { to: "/stage2", title: "2단계 · 자료 조사 및 입장 정리", desc: "찬·반 자료를 정리하고 내 주장을 구성합니다.", done: p.research },
-    { to: "/stage3", title: "3단계 · 찬성 입장 토론 + 성찰", desc: "AI(반대)와 토론 → 성찰 챗봇", done: p.debate3Ended && p.reflection3 },
-    { to: "/stage4", title: "4단계 · 반대 입장 토론 + 성찰", desc: "AI(찬성)와 토론 → 성찰 챗봇", done: p.debate4Ended && p.reflection4 },
+    { to: "/stage3", title: "3단계 · 3-1 찬성 토론 / 3-2 토론 성찰", desc: "찬성 토론 후 토론 기록을 보며 성찰 챗봇과 대화하고 메모를 작성합니다.", done: p.debate3Ended && p.reflection3 },
+    { to: "/stage4", title: "4단계 · 4-1 반대 토론 / 4-2 토론 성찰", desc: "반대 토론 후 토론 기록을 보며 성찰 챗봇과 대화하고 메모를 작성합니다.", done: p.debate4Ended && p.reflection4 },
     { to: "/stage5", title: "5단계 · 최종 보고서 + 사후 설문", desc: "모든 토론을 정리하고 사후 설문 진행", done: p.report && p.post },
   ];
 

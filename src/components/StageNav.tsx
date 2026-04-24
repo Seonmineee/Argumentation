@@ -4,8 +4,10 @@ import { useStudent, setStudent } from "@/lib/student";
 const stages = [
   { to: "/stage1", label: "1. 사전 설문" },
   { to: "/stage2", label: "2. 자료 조사" },
-  { to: "/stage3", label: "3. 찬성 토론" },
-  { to: "/stage4", label: "4. 반대 토론" },
+  { to: "/stage3", label: "3-1. 찬성 토론" },
+  { to: "/stage3/reflection", label: "3-2. 토론 성찰" },
+  { to: "/stage4", label: "4-1. 반대 토론" },
+  { to: "/stage4/reflection", label: "4-2. 토론 성찰" },
   { to: "/stage5", label: "5. 최종 보고서" },
 ] as const;
 
