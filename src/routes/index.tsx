@@ -5,7 +5,6 @@ import { getStudent, setStudent } from "@/lib/student";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { DEBATE_TOPIC } from "@/lib/topic";
 
 export const Route = createFileRoute("/")({
   head: () => ({
@@ -21,7 +20,6 @@ function LoginPage() {
   const navigate = useNavigate();
   const [studentNumber, setStudentNumber] = useState("");
   const [phoneLast4, setPhoneLast4] = useState("");
-  const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -48,7 +46,7 @@ function LoginPage() {
       if (!row) {
         const { data: inserted, error: insErr } = await supabase
           .from("students")
-          .insert({ student_number: studentNumber, phone_last4: phoneLast4, name: name || null })
+          .insert({ student_number: studentNumber, phone_last4: phoneLast4 })
           .select()
           .single();
         if (insErr) throw insErr;
@@ -80,9 +78,6 @@ function LoginPage() {
            <p className="text-sm text-muted-foreground">AI와 함께 토론하고 나의 토론을 성찰하세요.</p>
          </div>
         <div className="rounded-2xl border bg-card p-6 shadow-sm">
-          <p className="mb-4 rounded-lg bg-muted p-3 text-xs leading-relaxed text-muted-foreground">
-            <span className="font-semibold text-foreground">오늘의 논제 ·</span> {DEBATE_TOPIC}
-          </p>
           <form onSubmit={onSubmit} className="space-y-4">
             <div>
               <Label htmlFor="sn">학번</Label>
@@ -93,10 +88,6 @@ function LoginPage() {
               <Label htmlFor="ph">휴대폰 끝 4자리</Label>
               <Input id="ph" inputMode="numeric" maxLength={4} placeholder="예: 1234"
                 value={phoneLast4} onChange={(e) => setPhoneLast4(e.target.value.replace(/\D/g, "").slice(0, 4))} />
-            </div>
-            <div>
-              <Label htmlFor="nm">이름 (선택)</Label>
-              <Input id="nm" placeholder="홍길동" value={name} onChange={(e) => setName(e.target.value)} />
             </div>
             {error && <p className="text-sm text-destructive">{error}</p>}
             <Button type="submit" className="w-full" disabled={loading}>
