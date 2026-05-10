@@ -9,11 +9,7 @@ const URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/research-chat`;
 
 export function ResearchChat() {
   const [messages, setMessages] = useState<ChatMsg[]>([
-    {
-      role: "assistant",
-      content:
-        "안녕하세요! 자료 조사를 도와드리는 AI입니다. 논제와 관련된 사실, 찬·반 논거, 통계, 관련 법·제도 등 무엇이든 물어보세요.",
-    },
+    { role: "assistant", content: "안녕하세요?" },
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
