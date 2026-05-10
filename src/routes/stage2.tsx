@@ -65,7 +65,7 @@ function Stage2() {
         <details className="group my-3 rounded-lg border bg-card p-3 text-sm">
           <summary className="flex cursor-pointer items-center justify-between gap-3 font-semibold text-primary [&::-webkit-details-marker]:hidden">
             <span>논제: {DEBATE_TOPIC}</span>
-            <span className="shrink-0 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-medium text-primary transition-colors group-hover:bg-primary/20">
+            <span className="shrink-0 rounded-full border border-red-500/40 bg-red-500/10 px-3 py-1 text-xs font-medium text-red-600 transition-colors group-hover:bg-red-500/20">
               자세히 <span className="group-open:hidden">▼</span><span className="hidden group-open:inline">▲</span>
             </span>
           </summary>
