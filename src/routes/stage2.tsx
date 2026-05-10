@@ -5,10 +5,10 @@ import { supabase } from "@/integrations/supabase/client";
 import { StageNav } from "@/components/StageNav";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Textarea } from "@/components/ui/textarea";
 import { DEBATE_TOPIC, TOPIC_BACKGROUND } from "@/lib/topic";
 import { toast } from "sonner";
 import { ResearchChat } from "@/components/ResearchChat";
+import { RichTextEditor } from "@/components/RichTextEditor";
 
 export const Route = createFileRoute("/stage2")({
   component: Stage2,
@@ -57,12 +57,12 @@ function Stage2() {
   return (
     <div className="min-h-screen bg-background">
       <StageNav />
-      <main className="mx-auto max-w-[1400px] px-4 py-8">
-        <h1 className="text-2xl font-bold text-primary">2단계 · 자료 조사 및 입장 정리</h1>
-        <p className="mt-2 text-sm text-muted-foreground">
+      <main className="mx-auto max-w-[1600px] px-4 py-4">
+        <h1 className="text-xl font-bold text-primary">2단계 · 자료 조사 및 입장 정리</h1>
+        <p className="mt-1 text-xs text-muted-foreground">
           인터넷·ChatGPT 등을 활용해 찬·반 양측의 주장을 조사하고, 자신의 주장과 근거를 정리하세요.
         </p>
-        <details className="group my-4 rounded-lg border bg-card p-4 text-sm">
+        <details className="group my-3 rounded-lg border bg-card p-3 text-sm">
           <summary className="flex cursor-pointer items-center justify-between gap-3 font-semibold text-primary [&::-webkit-details-marker]:hidden">
             <span>논제: {DEBATE_TOPIC}</span>
             <span className="shrink-0 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-medium text-primary transition-colors group-hover:bg-primary/20">
@@ -74,33 +74,31 @@ function Stage2() {
           </div>
         </details>
 
-        <div className="grid gap-5 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:h-[calc(100vh-12rem)]">
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:h-[calc(100vh-9rem)]">
           {/* LEFT: 두 정리 박스가 우측 높이에 맞춰 균등하게 채움 */}
-          <div className="flex min-h-0 flex-col gap-5">
-            <div className="flex min-h-0 flex-1 flex-col rounded-2xl border bg-card p-5">
-              <Label htmlFor="pro" className="text-base font-semibold text-primary">찬성측 관련 정보 정리</Label>
-              <Textarea
-                id="pro" value={pro} onChange={(e) => setPro(e.target.value)}
+          <div className="flex min-h-0 flex-col gap-3">
+            <div className="flex min-h-0 flex-1 flex-col rounded-2xl border bg-card p-3">
+              <Label className="mb-2 text-sm font-semibold text-primary">찬성측 관련 정보 정리</Label>
+              <RichTextEditor
+                value={pro} onChange={setPro}
                 placeholder="찬성 측의 주장, 근거, 사례, 통계 등을 자유롭게 정리해 보세요."
-                className="mt-2 min-h-0 flex-1 resize-none"
               />
             </div>
-            <div className="flex min-h-0 flex-1 flex-col rounded-2xl border bg-card p-5">
-              <Label htmlFor="con" className="text-base font-semibold text-primary">반대측 관련 정보 정리</Label>
-              <Textarea
-                id="con" value={con} onChange={(e) => setCon(e.target.value)}
+            <div className="flex min-h-0 flex-1 flex-col rounded-2xl border bg-card p-3">
+              <Label className="mb-2 text-sm font-semibold text-primary">반대측 관련 정보 정리</Label>
+              <RichTextEditor
+                value={con} onChange={setCon}
                 placeholder="반대 측의 주장, 근거, 사례, 통계 등을 자유롭게 정리해 보세요."
-                className="mt-2 min-h-0 flex-1 resize-none"
               />
             </div>
             <div className="flex justify-between">
-              <Button variant="outline" onClick={() => save(false)} disabled={saving}>저장만 하기</Button>
-              <Button onClick={() => save(true)} disabled={saving}>저장하고 3단계로</Button>
+              <Button variant="outline" size="sm" onClick={() => save(false)} disabled={saving}>저장만 하기</Button>
+              <Button size="sm" onClick={() => save(true)} disabled={saving}>저장하고 3단계로</Button>
             </div>
           </div>
 
           {/* RIGHT: AI chat + Google */}
-          <div className="flex min-h-0 flex-col gap-5">
+          <div className="flex min-h-0 flex-col gap-3">
             <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border bg-card">
               <div className="flex items-center justify-between border-b px-4 py-2">
                 <span className="text-sm font-semibold text-primary">AI 자료 조사 (ChatGPT)</span>
