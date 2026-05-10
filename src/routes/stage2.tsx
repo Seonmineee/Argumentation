@@ -104,7 +104,7 @@ function Stage2() {
                 <span className="text-sm font-semibold text-primary">AI 자료 조사 (ChatGPT)</span>
                 <span className="text-[11px] text-muted-foreground">실시간 채팅</span>
               </div>
-              <ResearchChat />
+              <ResearchChat student={student} />
             </div>
             <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border bg-card">
               <div className="flex items-center justify-between border-b px-4 py-2">

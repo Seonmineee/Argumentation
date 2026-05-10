@@ -36,3 +36,11 @@ export function useStudent() {
   }, []);
   return student;
 }
+
+/** Korean given name heuristic: drop the first character (성).
+ *  은선민 → 선민, 김민 → 민. For empty/short input falls back to original. */
+export function getGivenName(name?: string | null): string {
+  const n = (name ?? "").trim();
+  if (n.length >= 2) return n.slice(1);
+  return n;
+}

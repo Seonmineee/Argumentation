@@ -1,15 +1,20 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { streamChat, type ChatMsg } from "@/lib/stream";
 import { toast } from "sonner";
 import { Send, Loader2, Sparkles } from "lucide-react";
+import { getGivenName, type StudentSession } from "@/lib/student";
 
 const URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/research-chat`;
 
-export function ResearchChat() {
+export function ResearchChat({ student }: { student?: StudentSession | null }) {
+  const givenName = useMemo(() => getGivenName(student?.name), [student?.name]);
   const [messages, setMessages] = useState<ChatMsg[]>([
-    { role: "assistant", content: "안녕하세요?" },
+    {
+      role: "assistant",
+      content: givenName ? `${givenName}님 안녕하세요?` : "안녕하세요?",
+    },
   ]);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
@@ -29,7 +34,7 @@ export function ResearchChat() {
     let acc = "";
     await streamChat({
       url: URL,
-      body: { messages: next },
+      body: { messages: next, studentName: student?.name ?? "" },
       onDelta: (d) => {
         acc += d;
         setMessages((prev) => {

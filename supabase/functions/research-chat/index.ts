@@ -6,13 +6,27 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
+function givenNameFrom(fullName: string): string {
+  const n = (fullName ?? "").trim();
+  if (n.length >= 2) return n.slice(1);
+  return n;
+}
+
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { messages } = await req.json();
+    const { messages, studentName } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not set");
+
+    const given = givenNameFrom(studentName ?? "");
+    const nameRule = given
+      ? [{
+          role: "system",
+          content: `사용자(학생)의 이름은 "${studentName}"이며, 이름(성 제외)은 "${given}"입니다. 학생을 호명할 때는 반드시 "${given}님" 형태로 부르세요. 첫 응답과 자연스럽게 호명이 필요한 시점에 "${given}님"을 사용합니다. 그 외 답변 스타일·내용에는 다른 제약이 없습니다.`,
+        }]
+      : [];
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
       method: "POST",
@@ -22,7 +36,7 @@ Deno.serve(async (req) => {
       },
       body: JSON.stringify({
         model: "openai/gpt-5.5",
-        messages,
+        messages: [...nameRule, ...messages],
         stream: true,
       }),
     });
