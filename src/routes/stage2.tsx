@@ -62,8 +62,13 @@ function Stage2() {
         <p className="mt-2 text-sm text-muted-foreground">
           인터넷·ChatGPT 등을 활용해 찬·반 양측의 주장을 조사하고, 자신의 주장과 근거를 정리하세요.
         </p>
-        <details className="my-4 rounded-lg border bg-card p-4 text-sm">
-          <summary className="cursor-pointer font-semibold text-primary">논제: {DEBATE_TOPIC}</summary>
+        <details className="group my-4 rounded-lg border bg-card p-4 text-sm">
+          <summary className="flex cursor-pointer items-center justify-between gap-3 font-semibold text-primary [&::-webkit-details-marker]:hidden">
+            <span>논제: {DEBATE_TOPIC}</span>
+            <span className="shrink-0 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-medium text-primary transition-colors group-hover:bg-primary/20">
+              논제를 잘 모르겠어요 <span className="group-open:hidden">▼</span><span className="hidden group-open:inline">▲</span>
+            </span>
+          </summary>
           <div className="mt-3 whitespace-pre-line text-xs leading-relaxed text-muted-foreground">
             {TOPIC_BACKGROUND}
           </div>
