@@ -66,7 +66,7 @@ function Stage2() {
           <summary className="flex cursor-pointer items-center justify-between gap-3 font-semibold text-primary [&::-webkit-details-marker]:hidden">
             <span>논제: {DEBATE_TOPIC}</span>
             <span className="shrink-0 rounded-full border border-primary/30 bg-primary/10 px-3 py-1 text-xs font-medium text-primary transition-colors group-hover:bg-primary/20">
-              논제를 잘 모르겠어요 <span className="group-open:hidden">▼</span><span className="hidden group-open:inline">▲</span>
+              자세히 <span className="group-open:hidden">▼</span><span className="hidden group-open:inline">▲</span>
             </span>
           </summary>
           <div className="mt-3 whitespace-pre-line text-xs leading-relaxed text-muted-foreground">
