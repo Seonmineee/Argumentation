@@ -69,7 +69,7 @@ export function ReflectionView({
     let acc = "";
     await streamChat({
       url: `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/reflection-chat`,
-      body: { messages: history, studentPosition, debateTranscript: tr },
+      body: { messages: history, studentPosition, debateTranscript: tr, studentName: student.name ?? "" },
       onDelta: (d) => {
         acc += d;
         setMessages((prev) => {
