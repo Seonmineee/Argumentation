@@ -23,10 +23,18 @@ function LoginPage() {
   const [name, setName] = useState("");
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [isTest, setIsTest] = useState(false);
 
   useEffect(() => {
     if (getStudent()) navigate({ to: "/stage1" });
   }, [navigate]);
+
+  useEffect(() => {
+    if (typeof window !== "undefined") {
+      const params = new URLSearchParams(window.location.search);
+      setIsTest(params.get("test") === "1");
+    }
+  }, []);
 
   async function onSubmit(e: React.FormEvent) {
     e.preventDefault();
@@ -37,11 +45,13 @@ function LoginPage() {
     if (!trimmedName) return setError("이름을 입력해 주세요.");
     if (trimmedName.length > 50) return setError("이름은 50자 이내로 입력해 주세요.");
     setLoading(true);
+    const effectiveStudentNumber = isTest ? `${studentNumber}-T` : studentNumber;
+    const effectiveName = isTest ? `[TEST] ${trimmedName}` : trimmedName;
     try {
       const { data: existing, error: selErr } = await supabase
         .from("students")
         .select("*")
-        .eq("student_number", studentNumber)
+        .eq("student_number", effectiveStudentNumber)
         .eq("phone_last4", phoneLast4)
         .maybeSingle();
       if (selErr) throw selErr;
@@ -50,15 +60,15 @@ function LoginPage() {
       if (!row) {
         const { data: inserted, error: insErr } = await supabase
           .from("students")
-          .insert({ student_number: studentNumber, phone_last4: phoneLast4, name: trimmedName })
+          .insert({ student_number: effectiveStudentNumber, phone_last4: phoneLast4, name: effectiveName })
           .select()
           .single();
         if (insErr) throw insErr;
         row = inserted;
-      } else if (row.name !== trimmedName) {
+      } else if (row.name !== effectiveName) {
         const { data: updated, error: updErr } = await supabase
           .from("students")
-          .update({ name: trimmedName })
+          .update({ name: effectiveName })
           .eq("id", row.id)
           .select()
           .single();
@@ -86,6 +96,9 @@ function LoginPage() {
          <div className="mb-8 text-center space-y-2">
            <h1 className="text-3xl font-bold text-primary">ChatGPT 기반 토론 플랫폼</h1>
            <p className="text-sm text-muted-foreground">AI와 함께 토론하고 나의 토론을 성찰하세요.</p>
+           {isTest && (
+             <p className="text-xs font-semibold text-amber-600">테스트 모드 (별도 계정으로 저장됩니다)</p>
+           )}
          </div>
         <div className="rounded-2xl border bg-card p-6 shadow-sm">
           <form onSubmit={onSubmit} className="space-y-4">
