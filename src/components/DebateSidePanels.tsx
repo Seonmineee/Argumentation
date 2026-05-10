@@ -74,15 +74,29 @@ export function DebateSidePanels({ student, stage, side }: Props) {
           <div className="space-y-4 text-sm">
             <section>
               <div className="mb-1 text-xs font-semibold text-primary">{primaryLabel}</div>
-              <div className="whitespace-pre-wrap rounded-lg border bg-background p-3 text-sm leading-relaxed text-foreground min-h-[3rem]">
-                {primary || <span className="text-muted-foreground">아직 작성된 내용이 없습니다.</span>}
-              </div>
+              {primary ? (
+                <div
+                  className="prose prose-sm max-w-none rounded-lg border bg-background p-3 text-sm leading-relaxed text-foreground min-h-[3rem] [&_ul]:list-disc [&_ol]:list-decimal [&_ul]:pl-5 [&_ol]:pl-5"
+                  dangerouslySetInnerHTML={{ __html: primary }}
+                />
+              ) : (
+                <div className="rounded-lg border bg-background p-3 text-sm leading-relaxed min-h-[3rem]">
+                  <span className="text-muted-foreground">아직 작성된 내용이 없습니다.</span>
+                </div>
+              )}
             </section>
             <section>
               <div className="mb-1 text-xs font-semibold text-muted-foreground">{secondaryLabel}</div>
-              <div className="whitespace-pre-wrap rounded-lg border bg-muted/40 p-3 text-sm leading-relaxed text-foreground min-h-[3rem]">
-                {secondary || <span className="text-muted-foreground">아직 작성된 내용이 없습니다.</span>}
-              </div>
+              {secondary ? (
+                <div
+                  className="prose prose-sm max-w-none rounded-lg border bg-muted/40 p-3 text-sm leading-relaxed text-foreground min-h-[3rem] [&_ul]:list-disc [&_ol]:list-decimal [&_ul]:pl-5 [&_ol]:pl-5"
+                  dangerouslySetInnerHTML={{ __html: secondary }}
+                />
+              ) : (
+                <div className="rounded-lg border bg-muted/40 p-3 text-sm leading-relaxed min-h-[3rem]">
+                  <span className="text-muted-foreground">아직 작성된 내용이 없습니다.</span>
+                </div>
+              )}
             </section>
             {stage === 4 && (
               <section>
@@ -101,7 +115,7 @@ export function DebateSidePanels({ student, stage, side }: Props) {
         <div className="flex items-center justify-between gap-2 border-b px-4 py-3">
           <div>
             <h2 className="text-sm font-semibold">이번 토론으로 새로 알게 된 사실</h2>
-            <p className="text-xs text-muted-foreground mt-0.5">토론 중 떠오른 새 근거·통계·반박 포인트를 적어두세요.</p>
+            <p className="text-xs text-muted-foreground mt-0.5">추가로 알게 된 사실을 적어주세요.</p>
           </div>
           <div className="flex items-center gap-2">
             {savedAt && <span className="text-xs text-muted-foreground">저장됨 {savedAt}</span>}
@@ -114,7 +128,7 @@ export function DebateSidePanels({ student, stage, side }: Props) {
           <Textarea
             value={newFacts}
             onChange={(e) => setNewFacts(e.target.value)}
-            placeholder="예) AI가 제시한 ___ 사례, 새로 떠오른 반박 ___, 추가로 찾아볼 ___"
+            placeholder="추가로 알게 된 사실을 적어주세요."
             className="h-full resize-none"
           />
         </div>
