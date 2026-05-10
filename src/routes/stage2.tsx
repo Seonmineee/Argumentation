@@ -74,7 +74,7 @@ function Stage2() {
           </div>
         </details>
 
-        <div className="grid gap-4 lg:grid-cols-[minmax(0,1fr)_minmax(0,1fr)] lg:h-[calc(100vh-9rem)]">
+        <div className="grid gap-4 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)] lg:h-[calc(100vh-9rem)]">
           {/* LEFT: 두 정리 박스가 우측 높이에 맞춰 균등하게 채움 */}
           <div className="flex min-h-0 flex-col gap-3">
             <div className="flex min-h-0 flex-1 flex-col rounded-2xl border bg-card p-3">
