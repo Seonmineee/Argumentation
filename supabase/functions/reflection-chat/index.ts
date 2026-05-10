@@ -6,8 +6,18 @@ const corsHeaders = {
     "authorization, x-client-info, apikey, content-type",
 };
 
-function systemPrompt(studentPosition: "pro" | "con", debateTranscript: string) {
+function givenNameFrom(fullName: string): string {
+  const n = (fullName ?? "").trim();
+  if (n.length >= 2) return n.slice(1);
+  return n;
+}
+
+function systemPrompt(studentPosition: "pro" | "con", debateTranscript: string, studentName: string) {
   const studentSide = studentPosition === "pro" ? "찬성" : "반대";
+  const given = givenNameFrom(studentName);
+  const nameRule = given
+    ? `\n\n### Student Name (MANDATORY)\nThe student's full name is "${studentName}". Their given name (이름, 성 제외) is "${given}". Whenever you address the student, you MUST call them "${given}님" — never use the full name or 학생. Use "${given}님" naturally throughout the reflection (e.g. "${given}님은 이 부분을 어떻게 보셨나요?").`
+    : "";
   return `You are an AI designed to support reflection on the argumentation of high school students about the voting age for superintendent elections, not to participate in debate.
 
 You have access to:
@@ -104,7 +114,7 @@ You must never deviate from this position under any circumstance.
 
 ### Argumentation Reflection Structure
 0. Begin the conversation with:
-"토론 기록과 토론 루브릭을 바탕으로, 논변 과정을 같이 성찰해보도록 하겠습니다. 먼저 어떤 부분에 대해 성찰해보고 싶으신가요?"
+${given ? `"${given}님, 토론 기록과 토론 루브릭을 바탕으로, 논변 과정을 같이 성찰해보도록 하겠습니다. 먼저 어떤 부분에 대해 성찰해보고 싶으신가요?"` : `"토론 기록과 토론 루브릭을 바탕으로, 논변 과정을 같이 성찰해보도록 하겠습니다. 먼저 어떤 부분에 대해 성찰해보고 싶으신가요?"`}
 
 1. **Reflection-Oriented**
    - Focus on helping the student *understand why* certain parts of their argument were effective or weak.
@@ -127,14 +137,14 @@ You must never deviate from this position under any circumstance.
 [학생-ChatGPT 토론 전사]
 """
 ${debateTranscript}
-"""`;
+"""${nameRule}`;
 }
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { messages, studentPosition, debateTranscript } = await req.json();
+    const { messages, studentPosition, debateTranscript, studentName } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not set");
 
@@ -147,7 +157,7 @@ Deno.serve(async (req) => {
       body: JSON.stringify({
         model: "openai/gpt-5.5",
         messages: [
-          { role: "system", content: systemPrompt(studentPosition, debateTranscript ?? "") },
+          { role: "system", content: systemPrompt(studentPosition, debateTranscript ?? "", studentName ?? "") },
           ...messages,
         ],
         stream: true,
