@@ -68,7 +68,11 @@ function Stage1() {
           initial={initial}
           onSubmit={submit}
           submitting={submitting}
-          onSkip={() => navigate({ to: "/stage2" })}
+          onSkip={
+            student.student_number.endsWith("-T")
+              ? () => navigate({ to: "/stage2" })
+              : undefined
+          }
         />
       </main>
     </div>

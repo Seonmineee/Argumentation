@@ -68,7 +68,11 @@ function Stage5Survey() {
                 initial={postInitial}
                 onSubmit={submit}
                 submitting={submitting}
-                onSkip={() => setDone(true)}
+                onSkip={
+                  student.student_number.endsWith("-T")
+                    ? () => setDone(true)
+                    : undefined
+                }
                 includePostExtras
               />
             </div>
