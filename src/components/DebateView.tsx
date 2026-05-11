@@ -46,15 +46,20 @@ export function DebateView({
       }
 
       const { data: msgs } = await supabase.from("debate_chat")
-        .select("role,content").eq("session_id", sid!).order("created_at");
+        .select("user_message,assistant_message").eq("session_id", sid!).order("created_at");
 
       setSessionId(sid!);
-      setMessages((msgs ?? []).map((m) => ({ role: m.role as "user" | "assistant", content: m.content })));
+      const expanded: ChatMsg[] = [];
+      for (const m of msgs ?? []) {
+        if (m.user_message) expanded.push({ role: "user", content: m.user_message });
+        if (m.assistant_message) expanded.push({ role: "assistant", content: m.assistant_message });
+      }
+      setMessages(expanded);
       setLoaded(true);
     })();
   }, [student.id, stage, studentPosition]);
 
-  const callAI = useCallback(async (history: ChatMsg[], sid: string) => {
+  const callAI = useCallback(async (history: ChatMsg[], sid: string, userText: string | null) => {
     setStreaming(true);
     setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
     let acc = "";
@@ -73,7 +78,9 @@ export function DebateView({
         setStreaming(false);
         if (acc) {
           await supabase.from("debate_chat").insert({
-            session_id: sid, role: "assistant", content: acc,
+            session_id: sid,
+            user_message: userText,
+            assistant_message: acc,
           });
         }
       },
@@ -89,10 +96,11 @@ export function DebateView({
   useEffect(() => {
     if (!loaded || !sessionId || messages.length > 0 || initStarted.current) return;
     initStarted.current = true;
-    callAI([{ role: "user", content: "토론을 시작해 주세요. 입장과 핵심 근거 2개를 제시해 주세요." }], sessionId)
-      .then(() => {
-        // Don't store the synthetic kick-off as a real user message
-      });
+    callAI(
+      [{ role: "user", content: "토론을 시작해 주세요. 입장과 핵심 근거 2개를 제시해 주세요." }],
+      sessionId,
+      null,
+    );
   }, [loaded, sessionId, messages.length, callAI]);
 
   async function send(text: string) {
@@ -100,10 +108,7 @@ export function DebateView({
     const userMsg: ChatMsg = { role: "user", content: text };
     const next = [...messages, userMsg];
     setMessages(next);
-    await supabase.from("debate_chat").insert({
-      session_id: sessionId, role: "user", content: text,
-    });
-    await callAI(next, sessionId);
+    await callAI(next, sessionId, text);
   }
 
   async function endDebate() {
