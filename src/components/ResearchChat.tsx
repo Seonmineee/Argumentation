@@ -32,11 +32,6 @@ export function ResearchChat({ student }: { student?: StudentSession | null }) {
     const next = [...messages, { role: "user" as const, content: text }];
     setMessages([...next, { role: "assistant", content: "" }]);
     setLoading(true);
-    if (student?.id) {
-      supabase.from("research_chat").insert({
-        student_id: student.id, role: "user", content: text,
-      }).then(({ error }) => { if (error) console.error("save user msg", error); });
-    }
     let acc = "";
     await streamChat({
       url: URL,
@@ -53,8 +48,10 @@ export function ResearchChat({ student }: { student?: StudentSession | null }) {
         setLoading(false);
         if (student?.id && acc) {
           supabase.from("research_chat").insert({
-            student_id: student.id, role: "assistant", content: acc,
-          }).then(({ error }) => { if (error) console.error("save asst msg", error); });
+            student_id: student.id,
+            user_message: text,
+            assistant_message: acc,
+          }).then(({ error }) => { if (error) console.error("save turn", error); });
         }
       },
       onError: (err) => {

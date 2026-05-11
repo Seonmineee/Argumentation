@@ -41,8 +41,12 @@ export function ReflectionView({
       if (!sess) { setLoaded(true); return; }
 
       const { data: dmsgs } = await supabase.from("debate_chat")
-        .select("role,content").eq("session_id", sess.id).order("created_at");
-      const list = dmsgs ?? [];
+        .select("user_message,assistant_message").eq("session_id", sess.id).order("created_at");
+      const list: { role: string; content: string }[] = [];
+      for (const m of dmsgs ?? []) {
+        if (m.user_message) list.push({ role: "user", content: m.user_message });
+        if (m.assistant_message) list.push({ role: "assistant", content: m.assistant_message });
+      }
       if (list.length === 0) { setLoaded(true); return; }
       setHasDebate(true);
       setDebateMsgs(list);
@@ -52,9 +56,14 @@ export function ReflectionView({
       setTranscript(tr);
 
       const { data: rmsgs } = await supabase.from("reflection_chat")
-        .select("role,content").eq("student_id", student.id).eq("stage", stage)
+        .select("user_message,assistant_message").eq("student_id", student.id).eq("stage", stage)
         .order("created_at");
-      setMessages((rmsgs ?? []).map((m) => ({ role: m.role as "user" | "assistant", content: m.content })));
+      const expanded: ChatMsg[] = [];
+      for (const m of rmsgs ?? []) {
+        if (m.user_message) expanded.push({ role: "user", content: m.user_message });
+        if (m.assistant_message) expanded.push({ role: "assistant", content: m.assistant_message });
+      }
+      setMessages(expanded);
 
       const { data: noteRow } = await supabase.from("reflection_notes")
         .select("content").eq("student_id", student.id).eq("stage", stage).maybeSingle();
@@ -63,7 +72,7 @@ export function ReflectionView({
     })();
   }, [student.id, stage]);
 
-  const callAI = useCallback(async (history: ChatMsg[], tr: string) => {
+  const callAI = useCallback(async (history: ChatMsg[], tr: string, userText: string | null) => {
     setStreaming(true);
     setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
     let acc = "";
@@ -82,7 +91,10 @@ export function ReflectionView({
         setStreaming(false);
         if (acc) {
           await supabase.from("reflection_chat").insert({
-            student_id: student.id, stage, role: "assistant", content: acc,
+            student_id: student.id,
+            stage,
+            user_message: userText,
+            assistant_message: acc,
           });
         }
       },
@@ -97,17 +109,14 @@ export function ReflectionView({
   useEffect(() => {
     if (!loaded || !hasDebate || messages.length > 0 || initStarted.current) return;
     initStarted.current = true;
-    callAI([{ role: "user", content: "토론 성찰을 시작해 주세요." }], transcript);
+    callAI([{ role: "user", content: "토론 성찰을 시작해 주세요." }], transcript, null);
   }, [loaded, hasDebate, messages.length, callAI, transcript]);
 
   async function send(text: string) {
     const userMsg: ChatMsg = { role: "user", content: text };
     const next = [...messages, userMsg];
     setMessages(next);
-    await supabase.from("reflection_chat").insert({
-      student_id: student.id, stage, role: "user", content: text,
-    });
-    await callAI(next, transcript);
+    await callAI(next, transcript, text);
   }
 
   async function saveNote() {

@@ -16,25 +16,31 @@ export type Database = {
     Tables: {
       debate_chat: {
         Row: {
-          content: string
+          assistant_message: string | null
+          content: string | null
           created_at: string
           id: string
-          role: string
+          role: string | null
           session_id: string
+          user_message: string | null
         }
         Insert: {
-          content: string
+          assistant_message?: string | null
+          content?: string | null
           created_at?: string
           id?: string
-          role: string
+          role?: string | null
           session_id: string
+          user_message?: string | null
         }
         Update: {
-          content?: string
+          assistant_message?: string | null
+          content?: string | null
           created_at?: string
           id?: string
-          role?: string
+          role?: string | null
           session_id?: string
+          user_message?: string | null
         }
         Relationships: [
           {
@@ -147,28 +153,34 @@ export type Database = {
       }
       reflection_chat: {
         Row: {
-          content: string
+          assistant_message: string | null
+          content: string | null
           created_at: string
           id: string
-          role: string
+          role: string | null
           stage: number
           student_id: string
+          user_message: string | null
         }
         Insert: {
-          content: string
+          assistant_message?: string | null
+          content?: string | null
           created_at?: string
           id?: string
-          role: string
+          role?: string | null
           stage: number
           student_id: string
+          user_message?: string | null
         }
         Update: {
-          content?: string
+          assistant_message?: string | null
+          content?: string | null
           created_at?: string
           id?: string
-          role?: string
+          role?: string | null
           stage?: number
           student_id?: string
+          user_message?: string | null
         }
         Relationships: [
           {
@@ -214,25 +226,31 @@ export type Database = {
       }
       research_chat: {
         Row: {
-          content: string
+          assistant_message: string | null
+          content: string | null
           created_at: string
           id: string
-          role: string
+          role: string | null
           student_id: string
+          user_message: string | null
         }
         Insert: {
-          content: string
+          assistant_message?: string | null
+          content?: string | null
           created_at?: string
           id?: string
-          role: string
+          role?: string | null
           student_id: string
+          user_message?: string | null
         }
         Update: {
-          content?: string
+          assistant_message?: string | null
+          content?: string | null
           created_at?: string
           id?: string
-          role?: string
+          role?: string | null
           student_id?: string
+          user_message?: string | null
         }
         Relationships: []
       }
