@@ -14,7 +14,7 @@ export type Database = {
   }
   public: {
     Tables: {
-      debate_messages: {
+      debate_chat: {
         Row: {
           content: string
           created_at: string
@@ -145,7 +145,7 @@ export type Database = {
           },
         ]
       }
-      reflection_messages: {
+      reflection_chat: {
         Row: {
           content: string
           created_at: string
@@ -212,7 +212,7 @@ export type Database = {
           },
         ]
       }
-      research_messages: {
+      research_chat: {
         Row: {
           content: string
           created_at: string
@@ -236,7 +236,7 @@ export type Database = {
         }
         Relationships: []
       }
-      stage2_research: {
+      research_memo: {
         Row: {
           con_arguments: string | null
           id: string

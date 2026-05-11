@@ -32,9 +32,9 @@ function Dashboard() {
       const sid = student.id;
       const [surveys, research, sessions, refls, report] = await Promise.all([
         supabase.from("surveys").select("survey_type").eq("student_id", sid),
-        supabase.from("stage2_research").select("id").eq("student_id", sid).maybeSingle(),
+        supabase.from("research_memo").select("id").eq("student_id", sid).maybeSingle(),
         supabase.from("debate_sessions").select("stage,status").eq("student_id", sid),
-        supabase.from("reflection_messages").select("stage").eq("student_id", sid),
+        supabase.from("reflection_chat").select("stage").eq("student_id", sid),
         supabase.from("final_reports").select("id").eq("student_id", sid).maybeSingle(),
       ]);
       const types = new Set((surveys.data ?? []).map((r) => r.survey_type));

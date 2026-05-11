@@ -24,7 +24,7 @@ export function DebateSidePanels({ student, stage, side }: Props) {
   useEffect(() => {
     (async () => {
       const [researchRes, noteRes, reflRes] = await Promise.all([
-        supabase.from("stage2_research").select("pro_arguments,con_arguments")
+        supabase.from("research_memo").select("pro_arguments,con_arguments")
           .eq("student_id", student.id).maybeSingle(),
         supabase.from("debate_notes").select("content")
           .eq("student_id", student.id).eq("stage", stage).maybeSingle(),
