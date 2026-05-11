@@ -212,6 +212,30 @@ export type Database = {
           },
         ]
       }
+      research_messages: {
+        Row: {
+          content: string
+          created_at: string
+          id: string
+          role: string
+          student_id: string
+        }
+        Insert: {
+          content: string
+          created_at?: string
+          id?: string
+          role: string
+          student_id: string
+        }
+        Update: {
+          content?: string
+          created_at?: string
+          id?: string
+          role?: string
+          student_id?: string
+        }
+        Relationships: []
+      }
       stage2_research: {
         Row: {
           con_arguments: string | null
