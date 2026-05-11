@@ -5,6 +5,7 @@ import { streamChat, type ChatMsg } from "@/lib/stream";
 import { toast } from "sonner";
 import { Send, Loader2, Sparkles } from "lucide-react";
 import { getGivenName, type StudentSession } from "@/lib/student";
+import { supabase } from "@/integrations/supabase/client";
 
 const URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/research-chat`;
 
@@ -31,6 +32,11 @@ export function ResearchChat({ student }: { student?: StudentSession | null }) {
     const next = [...messages, { role: "user" as const, content: text }];
     setMessages([...next, { role: "assistant", content: "" }]);
     setLoading(true);
+    if (student?.id) {
+      supabase.from("research_messages").insert({
+        student_id: student.id, role: "user", content: text,
+      }).then(({ error }) => { if (error) console.error("save user msg", error); });
+    }
     let acc = "";
     await streamChat({
       url: URL,
@@ -43,7 +49,14 @@ export function ResearchChat({ student }: { student?: StudentSession | null }) {
           return copy;
         });
       },
-      onDone: () => setLoading(false),
+      onDone: () => {
+        setLoading(false);
+        if (student?.id && acc) {
+          supabase.from("research_messages").insert({
+            student_id: student.id, role: "assistant", content: acc,
+          }).then(({ error }) => { if (error) console.error("save asst msg", error); });
+        }
+      },
       onError: (err) => {
         setLoading(false);
         setMessages((prev) => prev.slice(0, -1));

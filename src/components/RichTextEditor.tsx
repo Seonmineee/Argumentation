@@ -3,7 +3,7 @@ import StarterKit from "@tiptap/starter-kit";
 import { useEffect } from "react";
 import { Button } from "@/components/ui/button";
 import {
-  Bold, Italic, List, ListOrdered, Heading2, Heading3, Strikethrough, Undo2, Redo2,
+  Bold, Italic, List, ListOrdered, Heading1, Heading2, Strikethrough, Undo2, Redo2,
 } from "lucide-react";
 
 type Props = {
@@ -20,7 +20,7 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Prop
     editorProps: {
       attributes: {
         class:
-          "prose prose-sm max-w-none focus:outline-none min-h-full px-3 py-2 [&_ul]:list-disc [&_ol]:list-decimal [&_ul]:pl-5 [&_ol]:pl-5 [&_h2]:text-xl [&_h2]:font-bold [&_h2]:mt-3 [&_h2]:mb-1 [&_h3]:text-base [&_h3]:font-semibold [&_h3]:mt-2 [&_h3]:mb-1",
+          "prose prose-sm max-w-none focus:outline-none min-h-full px-3 py-2 [&_ul]:list-disc [&_ol]:list-decimal [&_ul]:pl-5 [&_ol]:pl-5 [&_h1]:text-2xl [&_h1]:font-bold [&_h1]:mt-3 [&_h1]:mb-1 [&_h2]:text-lg [&_h2]:font-semibold [&_h2]:mt-2 [&_h2]:mb-1",
         "data-placeholder": placeholder ?? "",
       },
     },
@@ -59,13 +59,13 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Prop
           <Strikethrough className="h-3.5 w-3.5" />
         </Button>
         <div className="mx-1 h-4 w-px bg-border" />
-        <Button type="button" variant="ghost" size="sm" className={btn(editor.isActive("heading", { level: 2 }))}
-          onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} title="제목 큰">
-          <Heading2 className="h-3.5 w-3.5" />
+        <Button type="button" variant="ghost" size="sm" className={btn(editor.isActive("heading", { level: 1 }))}
+          onClick={() => editor.chain().focus().toggleHeading({ level: 1 }).run()} title="제목 큰">
+          <Heading1 className="h-3.5 w-3.5" />
         </Button>
-        <Button type="button" variant="ghost" size="sm" className={btn(editor.isActive("heading", { level: 3 }))}
-          onClick={() => editor.chain().focus().toggleHeading({ level: 3 }).run()} title="제목 작은">
-          <Heading3 className="h-3.5 w-3.5" />
+        <Button type="button" variant="ghost" size="sm" className={btn(editor.isActive("heading", { level: 2 }))}
+          onClick={() => editor.chain().focus().toggleHeading({ level: 2 }).run()} title="제목 작은">
+          <Heading2 className="h-3.5 w-3.5" />
         </Button>
         <div className="mx-1 h-4 w-px bg-border" />
         <Button type="button" variant="ghost" size="sm" className={btn(editor.isActive("bulletList"))}
