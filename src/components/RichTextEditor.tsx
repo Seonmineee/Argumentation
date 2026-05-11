@@ -20,7 +20,7 @@ export function RichTextEditor({ value, onChange, placeholder, className }: Prop
     editorProps: {
       attributes: {
         class:
-          "prose prose-sm max-w-none focus:outline-none min-h-full px-3 py-2 [&_ul]:list-disc [&_ol]:list-decimal [&_ul]:pl-5 [&_ol]:pl-5",
+          "prose prose-sm max-w-none focus:outline-none min-h-full px-3 py-2 [&_ul]:list-disc [&_ol]:list-decimal [&_ul]:pl-5 [&_ol]:pl-5 [&_h2]:text-xl [&_h2]:font-bold [&_h2]:mt-3 [&_h2]:mb-1 [&_h3]:text-base [&_h3]:font-semibold [&_h3]:mt-2 [&_h3]:mb-1",
         "data-placeholder": placeholder ?? "",
       },
     },
