@@ -98,25 +98,14 @@ function Stage2() {
           </div>
 
           {/* RIGHT: AI chat + Google */}
-          <div className="flex min-h-0 flex-col gap-3">
+          {/* RIGHT: AI chat fills entire right column */}
+          <div className="flex min-h-0 flex-col">
             <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border bg-card">
               <div className="flex items-center justify-between border-b px-4 py-2">
                 <span className="text-sm font-semibold text-primary">AI 자료 조사 (ChatGPT)</span>
                 <span className="text-[11px] text-muted-foreground">실시간 채팅</span>
               </div>
               <ResearchChat student={student} />
-            </div>
-            <div className="flex min-h-0 flex-1 flex-col overflow-hidden rounded-2xl border bg-card">
-              <div className="flex items-center justify-between border-b px-4 py-2">
-                <span className="text-sm font-semibold text-primary">Google 검색</span>
-                <a href="https://www.google.com/" target="_blank" rel="noreferrer"
-                  className="text-xs text-muted-foreground hover:underline">새 창 열기 ↗</a>
-              </div>
-              <iframe
-                src="https://www.google.com/webhp?igu=1"
-                title="Google Search"
-                className="h-full w-full flex-1"
-              />
             </div>
           </div>
         </div>

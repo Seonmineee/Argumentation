@@ -109,7 +109,7 @@ function LoginPage() {
             </div>
             <div>
               <Label htmlFor="sn">학번</Label>
-              <Input id="sn" inputMode="numeric" placeholder="예: 30215"
+              <Input id="sn" inputMode="numeric" placeholder="예: 10101"
                 value={studentNumber} onChange={(e) => setStudentNumber(e.target.value.replace(/\D/g, ""))} />
             </div>
             <div>
