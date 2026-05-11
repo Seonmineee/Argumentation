@@ -45,7 +45,7 @@ export function DebateView({
         sid = created.id;
       }
 
-      const { data: msgs } = await supabase.from("debate_messages")
+      const { data: msgs } = await supabase.from("debate_chat")
         .select("role,content").eq("session_id", sid!).order("created_at");
 
       setSessionId(sid!);
@@ -72,7 +72,7 @@ export function DebateView({
       onDone: async () => {
         setStreaming(false);
         if (acc) {
-          await supabase.from("debate_messages").insert({
+          await supabase.from("debate_chat").insert({
             session_id: sid, role: "assistant", content: acc,
           });
         }
@@ -100,7 +100,7 @@ export function DebateView({
     const userMsg: ChatMsg = { role: "user", content: text };
     const next = [...messages, userMsg];
     setMessages(next);
-    await supabase.from("debate_messages").insert({
+    await supabase.from("debate_chat").insert({
       session_id: sessionId, role: "user", content: text,
     });
     await callAI(next, sessionId);

@@ -33,7 +33,7 @@ export function ResearchChat({ student }: { student?: StudentSession | null }) {
     setMessages([...next, { role: "assistant", content: "" }]);
     setLoading(true);
     if (student?.id) {
-      supabase.from("research_messages").insert({
+      supabase.from("research_chat").insert({
         student_id: student.id, role: "user", content: text,
       }).then(({ error }) => { if (error) console.error("save user msg", error); });
     }
@@ -52,7 +52,7 @@ export function ResearchChat({ student }: { student?: StudentSession | null }) {
       onDone: () => {
         setLoading(false);
         if (student?.id && acc) {
-          supabase.from("research_messages").insert({
+          supabase.from("research_chat").insert({
             student_id: student.id, role: "assistant", content: acc,
           }).then(({ error }) => { if (error) console.error("save asst msg", error); });
         }

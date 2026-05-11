@@ -25,7 +25,7 @@ function Stage2() {
     if (student === null) return;
     if (!student) { navigate({ to: "/" }); return; }
     (async () => {
-      const { data } = await supabase.from("stage2_research").select("*")
+      const { data } = await supabase.from("research_memo").select("*")
         .eq("student_id", student.id).maybeSingle();
       if (data) {
         setPro(data.pro_arguments ?? "");
@@ -37,7 +37,7 @@ function Stage2() {
   async function save(next?: boolean) {
     if (!student) return;
     setSaving(true);
-    const { error } = await supabase.from("stage2_research").upsert({
+    const { error } = await supabase.from("research_memo").upsert({
       student_id: student.id,
       pro_arguments: pro,
       con_arguments: con,

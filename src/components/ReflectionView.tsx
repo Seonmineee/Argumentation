@@ -40,7 +40,7 @@ export function ReflectionView({
         .select("id").eq("student_id", student.id).eq("stage", stage).maybeSingle();
       if (!sess) { setLoaded(true); return; }
 
-      const { data: dmsgs } = await supabase.from("debate_messages")
+      const { data: dmsgs } = await supabase.from("debate_chat")
         .select("role,content").eq("session_id", sess.id).order("created_at");
       const list = dmsgs ?? [];
       if (list.length === 0) { setLoaded(true); return; }
@@ -51,7 +51,7 @@ export function ReflectionView({
         .join("\n\n");
       setTranscript(tr);
 
-      const { data: rmsgs } = await supabase.from("reflection_messages")
+      const { data: rmsgs } = await supabase.from("reflection_chat")
         .select("role,content").eq("student_id", student.id).eq("stage", stage)
         .order("created_at");
       setMessages((rmsgs ?? []).map((m) => ({ role: m.role as "user" | "assistant", content: m.content })));
@@ -81,7 +81,7 @@ export function ReflectionView({
       onDone: async () => {
         setStreaming(false);
         if (acc) {
-          await supabase.from("reflection_messages").insert({
+          await supabase.from("reflection_chat").insert({
             student_id: student.id, stage, role: "assistant", content: acc,
           });
         }
@@ -104,7 +104,7 @@ export function ReflectionView({
     const userMsg: ChatMsg = { role: "user", content: text };
     const next = [...messages, userMsg];
     setMessages(next);
-    await supabase.from("reflection_messages").insert({
+    await supabase.from("reflection_chat").insert({
       student_id: student.id, stage, role: "user", content: text,
     });
     await callAI(next, transcript);
