@@ -11,15 +11,39 @@ const URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/research-chat`;
 
 export function ResearchChat({ student }: { student?: StudentSession | null }) {
   const givenName = useMemo(() => getGivenName(student?.name), [student?.name]);
-  const [messages, setMessages] = useState<ChatMsg[]>([
-    {
-      role: "assistant",
-      content: givenName ? `${givenName}님 안녕하세요?` : "안녕하세요?",
-    },
-  ]);
+  const [messages, setMessages] = useState<ChatMsg[]>([]);
+  const [loaded, setLoaded] = useState(false);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  // Load prior conversation so students can resume across sessions
+  useEffect(() => {
+    let cancelled = false;
+    (async () => {
+      if (!student?.id) { setLoaded(true); return; }
+      const { data } = await supabase
+        .from("research_chat")
+        .select("user_message,assistant_message")
+        .eq("student_id", student.id)
+        .order("created_at");
+      if (cancelled) return;
+      const expanded: ChatMsg[] = [];
+      for (const m of data ?? []) {
+        if (m.user_message) expanded.push({ role: "user", content: m.user_message });
+        if (m.assistant_message) expanded.push({ role: "assistant", content: m.assistant_message });
+      }
+      if (expanded.length === 0) {
+        expanded.push({
+          role: "assistant",
+          content: givenName ? `${givenName}님 안녕하세요?` : "안녕하세요?",
+        });
+      }
+      setMessages(expanded);
+      setLoaded(true);
+    })();
+    return () => { cancelled = true; };
+  }, [student?.id, givenName]);
 
   useEffect(() => {
     scrollRef.current?.scrollTo({ top: scrollRef.current.scrollHeight, behavior: "smooth" });
