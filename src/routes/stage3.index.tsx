@@ -22,7 +22,7 @@ function Stage3() {
         <div className="mb-5">
           <h1 className="text-3xl font-bold tracking-tight text-primary">3-1단계 · 찬성 입장 토론</h1>
           <p className="mt-2 text-base leading-relaxed text-foreground">
-            나는 <span className="rounded-md bg-accent/15 px-2 py-0.5 font-bold text-accent">찬성</span>, AI는 <span className="font-semibold text-muted-foreground">반대</span> 입장입니다. 끝까지 자신의 입장을 견지해 보세요.
+            나의 입장은 <span className="rounded-md border-2 border-red-500 bg-red-50 px-2 py-0.5 text-lg font-extrabold text-red-600">찬성</span>, AI의 입장은 <span className="rounded-md border border-red-300 bg-red-50/60 px-2 py-0.5 font-bold text-red-500">반대</span>입니다. 끝까지 자신의 입장을 견지해 보세요.
           </p>
         </div>
         <div className="grid gap-4 lg:grid-cols-2">

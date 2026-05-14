@@ -12,10 +12,12 @@ type Props = {
   disabled?: boolean;
   emptyHint?: string;
   rightSlot?: React.ReactNode;
+  userLabel?: React.ReactNode;
+  assistantLabel?: React.ReactNode;
 };
 
 export function ChatPanel({
-  messages, isStreaming, onSend, placeholder, disabled, emptyHint, rightSlot,
+  messages, isStreaming, onSend, placeholder, disabled, emptyHint, rightSlot, userLabel, assistantLabel,
 }: Props) {
   const [input, setInput] = useState("");
   const scrollRef = useRef<HTMLDivElement>(null);
@@ -44,6 +46,11 @@ export function ChatPanel({
                 ? "bg-primary text-primary-foreground"
                 : "bg-muted text-foreground"
             }`}>
+              {((m.role === "user" && userLabel) || (m.role === "assistant" && assistantLabel)) && (
+                <div className="mb-1 text-xs font-semibold opacity-90">
+                  {m.role === "user" ? userLabel : assistantLabel}
+                </div>
+              )}
               <div className="prose prose-sm max-w-none prose-p:my-1.5 prose-headings:my-2 [&_*]:text-inherit">
                 <ReactMarkdown>{m.content || (m.role === "assistant" && isStreaming && i === messages.length - 1 ? "…" : "")}</ReactMarkdown>
               </div>
