@@ -20,6 +20,11 @@ function Stage5Reflection() {
   const [note3, setNote3] = useState("");
   const [note4, setNote4] = useState("");
 
+  // 한글 기준 단어 수: 공백으로 분리한 토큰 개수
+  const wordCount = report.trim().length === 0 ? 0 : report.trim().split(/\s+/).length;
+  const MIN_WORDS = 50;
+  const meetsMin = wordCount >= MIN_WORDS;
+
   useEffect(() => {
     if (student === null) return;
     if (!student) { navigate({ to: "/" }); return; }
@@ -40,7 +45,7 @@ function Stage5Reflection() {
 
   async function saveAndGo() {
     if (!student) return;
-    if (report.trim().length < 100) return toast.error("최소 100자 이상 작성해 주세요.");
+    if (!meetsMin) return toast.error(`최소 ${MIN_WORDS}단어 이상 작성해 주세요. (현재 ${wordCount}단어)`);
     setSaving(true);
     const { error } = await supabase.from("final_reports").upsert(
       { student_id: student.id, content: report, updated_at: new Date().toISOString() },
@@ -97,6 +102,9 @@ function Stage5Reflection() {
               <p className="text-xs text-muted-foreground mt-0.5">
                 포함하면 좋아요: ① AI와의 토론을 통해 얻은 통찰, ② 토론에서 나의 잘했던 부분 / 못했던 부분, ③ 인상 깊었던 부분
               </p>
+              <p className="mt-1 text-xs font-semibold text-red-600">
+                ※ 최소 {MIN_WORDS}단어 이상 작성해야 다음 단계로 넘어갈 수 있습니다.
+              </p>
             </div>
             <div className="flex-1 p-3">
               <Textarea
@@ -107,8 +115,10 @@ function Stage5Reflection() {
               />
             </div>
             <div className="flex items-center justify-between border-t px-4 py-3">
-              <span className="text-xs text-muted-foreground">{report.length}자</span>
-              <Button size="sm" onClick={saveAndGo} disabled={saving}>
+              <span className={`text-xs font-medium ${meetsMin ? "text-emerald-600" : "text-amber-600"}`}>
+                {wordCount}단어 / 최소 {MIN_WORDS}단어 ({report.length}자)
+              </span>
+              <Button size="sm" onClick={saveAndGo} disabled={saving || !meetsMin}>
                 {saving ? "저장 중..." : "저장하고 5-2 사후 설문으로 →"}
               </Button>
             </div>
