@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { getStudent, setStudent } from "@/lib/student";
+import { getStudent, setStudent, getResumeRoute } from "@/lib/student";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -26,7 +26,10 @@ function LoginPage() {
   const [isTest, setIsTest] = useState(false);
 
   useEffect(() => {
-    if (getStudent()) navigate({ to: "/stage1" });
+    const s = getStudent();
+    if (s) {
+      getResumeRoute(s.id).then((to) => navigate({ to }));
+    }
   }, [navigate]);
 
   useEffect(() => {
@@ -82,7 +85,8 @@ function LoginPage() {
         phone_last4: row.phone_last4,
         name: row.name,
       });
-      navigate({ to: "/stage1" });
+      const to = await getResumeRoute(row.id);
+      navigate({ to });
     } catch (err: unknown) {
       setError(err instanceof Error ? err.message : "로그인 중 오류가 발생했습니다.");
     } finally {

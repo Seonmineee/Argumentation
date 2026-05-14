@@ -55,7 +55,7 @@ export type Database = {
             columns: ["session_id"]
             isOneToOne: false
             referencedRelation: "debate_sessions_view"
-            referencedColumns: ["id"]
+            referencedColumns: ["session_id"]
           },
         ]
       }
@@ -362,6 +362,7 @@ export type Database = {
     Views: {
       debate_chat_view: {
         Row: {
+          ai_position_kr: string | null
           assistant_message: string | null
           created_at: string | null
           id: string | null
@@ -371,7 +372,7 @@ export type Database = {
           stage: number | null
           student_id: string | null
           student_number: string | null
-          student_position: string | null
+          student_position_kr: string | null
           user_message: string | null
         }
         Relationships: [
@@ -387,7 +388,7 @@ export type Database = {
             columns: ["session_id"]
             isOneToOne: false
             referencedRelation: "debate_sessions_view"
-            referencedColumns: ["id"]
+            referencedColumns: ["session_id"]
           },
           {
             foreignKeyName: "debate_sessions_student_id_fkey"
@@ -421,16 +422,18 @@ export type Database = {
       }
       debate_sessions_view: {
         Row: {
+          ai_position_kr: string | null
           created_at: string | null
           ended_at: string | null
-          id: string | null
           name: string | null
           phone_last4: string | null
+          session_id: string | null
           stage: number | null
           status: string | null
           student_id: string | null
           student_number: string | null
           student_position: string | null
+          student_position_kr: string | null
         }
         Relationships: [
           {
