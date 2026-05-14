@@ -127,12 +127,17 @@ export function DebateView({
 
   if (!loaded) return <div className="p-8 text-center text-muted-foreground">불러오는 중...</div>;
 
+  const myStance = studentPosition === "pro" ? "찬성" : "반대";
+  const aiStance = studentPosition === "pro" ? "반대" : "찬성";
+
   return (
     <ChatPanel
       messages={messages}
       isStreaming={streaming}
       onSend={send}
       emptyHint="AI가 첫 발언을 준비하고 있어요..."
+      userLabel={<span>나 <span className="font-bold text-red-500">({myStance})</span></span>}
+      assistantLabel={<span>AI <span className="font-bold text-red-500">({aiStance})</span></span>}
       rightSlot={
         <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
           <span className={userTurns < 5 ? "font-medium text-amber-600" : "font-medium text-emerald-600"}>
