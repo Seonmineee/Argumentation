@@ -29,7 +29,8 @@ Deno.serve(async (req) => {
       content:
         `${nameLine}답변은 반드시 3줄 이내로 매우 짧고 간결하게 작성하세요. ` +
         `불필요한 서론·맺음말·예시 나열·번호 목록을 쓰지 말고 핵심만 말하세요. ` +
-        `학생이 더 묻기 전까지는 부연 설명을 하지 않습니다.`,
+        `학생이 더 묻기 전까지는 부연 설명을 하지 않습니다. ` +
+        `학생이 최소 5회 이상 대화를 이어나갈 수 있도록, 한 번에 모든 정보를 주지 말고 한 가지씩만 답하며 자연스럽게 추가 질문을 유도하세요.`,
     };
 
     const response = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
