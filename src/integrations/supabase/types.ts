@@ -50,6 +50,13 @@ export type Database = {
             referencedRelation: "debate_sessions"
             referencedColumns: ["id"]
           },
+          {
+            foreignKeyName: "debate_messages_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "debate_sessions_view"
+            referencedColumns: ["id"]
+          },
         ]
       }
       debate_notes: {
@@ -353,7 +360,209 @@ export type Database = {
       }
     }
     Views: {
-      [_ in never]: never
+      debate_chat_view: {
+        Row: {
+          assistant_message: string | null
+          created_at: string | null
+          id: string | null
+          name: string | null
+          phone_last4: string | null
+          session_id: string | null
+          stage: number | null
+          student_id: string | null
+          student_number: string | null
+          student_position: string | null
+          user_message: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "debate_messages_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "debate_sessions"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "debate_messages_session_id_fkey"
+            columns: ["session_id"]
+            isOneToOne: false
+            referencedRelation: "debate_sessions_view"
+            referencedColumns: ["id"]
+          },
+          {
+            foreignKeyName: "debate_sessions_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      debate_notes_view: {
+        Row: {
+          content: string | null
+          id: string | null
+          name: string | null
+          phone_last4: string | null
+          stage: number | null
+          student_id: string | null
+          student_number: string | null
+          updated_at: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "debate_notes_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      debate_sessions_view: {
+        Row: {
+          created_at: string | null
+          ended_at: string | null
+          id: string | null
+          name: string | null
+          phone_last4: string | null
+          stage: number | null
+          status: string | null
+          student_id: string | null
+          student_number: string | null
+          student_position: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "debate_sessions_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      final_reports_view: {
+        Row: {
+          content: string | null
+          id: string | null
+          name: string | null
+          phone_last4: string | null
+          student_id: string | null
+          student_number: string | null
+          updated_at: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "final_reports_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: true
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reflection_chat_view: {
+        Row: {
+          assistant_message: string | null
+          created_at: string | null
+          id: string | null
+          name: string | null
+          phone_last4: string | null
+          stage: number | null
+          student_id: string | null
+          student_number: string | null
+          user_message: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reflection_messages_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      reflection_notes_view: {
+        Row: {
+          content: string | null
+          id: string | null
+          name: string | null
+          phone_last4: string | null
+          stage: number | null
+          student_id: string | null
+          student_number: string | null
+          updated_at: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "reflection_notes_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      research_chat_view: {
+        Row: {
+          assistant_message: string | null
+          created_at: string | null
+          id: string | null
+          name: string | null
+          phone_last4: string | null
+          student_id: string | null
+          student_number: string | null
+          user_message: string | null
+        }
+        Relationships: []
+      }
+      research_memo_view: {
+        Row: {
+          con_arguments: string | null
+          id: string | null
+          my_claim: string | null
+          my_evidence: string | null
+          my_position: string | null
+          name: string | null
+          phone_last4: string | null
+          pro_arguments: string | null
+          student_id: string | null
+          student_number: string | null
+          updated_at: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "stage2_research_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: true
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      surveys_view: {
+        Row: {
+          created_at: string | null
+          id: string | null
+          name: string | null
+          phone_last4: string | null
+          responses: Json | null
+          student_id: string | null
+          student_number: string | null
+          survey_type: string | null
+        }
+        Relationships: [
+          {
+            foreignKeyName: "surveys_student_id_fkey"
+            columns: ["student_id"]
+            isOneToOne: false
+            referencedRelation: "students"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
     }
     Functions: {
       [_ in never]: never
