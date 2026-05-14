@@ -186,11 +186,15 @@ export function ReflectionView({
             <span className={userTurns < 5 ? "font-medium text-amber-600" : "font-medium text-emerald-600"}>
               나의 발언 {userTurns}회 {userTurns < 5 ? `(최소 5회 · 앞으로 ${5 - userTurns}회)` : "✓"}
             </span>
-            <Link to={nextHref} disabled={userTurns < 5}>
-              <Button size="sm" disabled={userTurns < 5} title={userTurns < 5 ? "최소 5회 이상 성찰 대화 후 이동할 수 있습니다." : ""}>
+            {userTurns < 5 ? (
+              <Button size="sm" disabled title="최소 5회 이상 성찰 대화 후 이동할 수 있습니다.">
                 {nextLabel} →
               </Button>
-            </Link>
+            ) : (
+              <Link to={nextHref}>
+                <Button size="sm">{nextLabel} →</Button>
+              </Link>
+            )}
           </div>
         }
       />
