@@ -29,9 +29,10 @@ export function ReflectionView({
   const [loaded, setLoaded] = useState(false);
   const [hasDebate, setHasDebate] = useState(false);
   const [note, setNote] = useState<string>("");
-  const [savingNote, setSavingNote] = useState(false);
   const [noteSaved, setNoteSaved] = useState<string>("");
   const initStarted = useRef(false);
+
+  const userTurns = messages.filter((m) => m.role === "user").length;
 
   useEffect(() => {
     (async () => {
@@ -119,20 +120,17 @@ export function ReflectionView({
     await callAI(next, transcript, text);
   }
 
-  async function saveNote() {
-    setSavingNote(true);
-    try {
+  // Auto-save note (debounced)
+  useEffect(() => {
+    if (!loaded || !hasDebate) return;
+    const t = setTimeout(async () => {
       const { error } = await supabase.from("reflection_notes").upsert({
         student_id: student.id, stage, content: note, updated_at: new Date().toISOString(),
       }, { onConflict: "student_id,stage" });
-      if (error) throw error;
-      setNoteSaved(new Date().toLocaleTimeString());
-    } catch {
-      toast.error("메모 저장 실패");
-    } finally {
-      setSavingNote(false);
-    }
-  }
+      if (!error) setNoteSaved(new Date().toLocaleTimeString());
+    }, 800);
+    return () => clearTimeout(t);
+  }, [note, loaded, hasDebate, student.id, stage]);
 
   if (!loaded) return <div className="p-8 text-center text-muted-foreground">불러오는 중...</div>;
 
@@ -184,9 +182,14 @@ export function ReflectionView({
         placeholder="성찰 코치의 질문에 자유롭게 답해 보세요."
         emptyHint="성찰 코치가 첫 질문을 준비하고 있어요..."
         rightSlot={
-          <div className="flex items-center justify-end gap-2 text-xs text-muted-foreground">
-            <Link to={nextHref}>
-              <Button size="sm">{nextLabel} →</Button>
+          <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
+            <span className={userTurns < 5 ? "font-medium text-amber-600" : "font-medium text-emerald-600"}>
+              나의 발언 {userTurns}회 {userTurns < 5 ? `(최소 5회 · 앞으로 ${5 - userTurns}회)` : "✓"}
+            </span>
+            <Link to={nextHref} disabled={userTurns < 5}>
+              <Button size="sm" disabled={userTurns < 5} title={userTurns < 5 ? "최소 5회 이상 성찰 대화 후 이동할 수 있습니다." : ""}>
+                {nextLabel} →
+              </Button>
             </Link>
           </div>
         }
@@ -202,12 +205,7 @@ export function ReflectionView({
             토론 기록과 성찰 코치와의 대화를 보면서, 배운 점·개선할 점·다음에 시도할 전략을 자유롭게 적어 보세요.
           </p>
         </div>
-        <div className="flex items-center gap-2">
-          {noteSaved && <span className="text-xs text-muted-foreground">저장됨 {noteSaved}</span>}
-          <Button size="sm" onClick={saveNote} disabled={savingNote}>
-            {savingNote ? "저장 중..." : "메모 저장"}
-          </Button>
-        </div>
+        {noteSaved && <span className="text-xs text-muted-foreground">자동 저장됨 {noteSaved}</span>}
       </div>
       <Textarea
         value={note}

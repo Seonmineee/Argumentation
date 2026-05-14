@@ -1,9 +1,7 @@
 import { useEffect, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
-import { Button } from "@/components/ui/button";
 import { Textarea } from "@/components/ui/textarea";
 import { ScrollArea } from "@/components/ui/scroll-area";
-import { toast } from "sonner";
 import type { StudentSession } from "@/lib/student";
 
 type Props = {
@@ -18,8 +16,8 @@ export function DebateSidePanels({ student, stage, side }: Props) {
   const [conNotes, setConNotes] = useState("");
   const [reflection3, setReflection3] = useState<string>("");
   const [newFacts, setNewFacts] = useState("");
-  const [saving, setSaving] = useState(false);
   const [savedAt, setSavedAt] = useState<string>("");
+  const [loaded, setLoaded] = useState(false);
 
   useEffect(() => {
     (async () => {
@@ -37,23 +35,21 @@ export function DebateSidePanels({ student, stage, side }: Props) {
       setConNotes(researchRes.data?.con_arguments ?? "");
       if (noteRes.data?.content) setNewFacts(noteRes.data.content);
       if (reflRes.data?.content) setReflection3(reflRes.data.content);
+      setLoaded(true);
     })();
   }, [student.id, stage]);
 
-  async function saveNewFacts() {
-    setSaving(true);
-    try {
+  // Auto-save (debounced)
+  useEffect(() => {
+    if (!loaded) return;
+    const t = setTimeout(async () => {
       const { error } = await supabase.from("debate_notes").upsert({
         student_id: student.id, stage, content: newFacts, updated_at: new Date().toISOString(),
       }, { onConflict: "student_id,stage" });
-      if (error) throw error;
-      setSavedAt(new Date().toLocaleTimeString());
-    } catch {
-      toast.error("메모 저장 실패");
-    } finally {
-      setSaving(false);
-    }
-  }
+      if (!error) setSavedAt(new Date().toLocaleTimeString());
+    }, 800);
+    return () => clearTimeout(t);
+  }, [newFacts, loaded, student.id, stage]);
 
   const primaryLabel = side === "pro" ? "찬성측 사전 조사 메모" : "반대측 사전 조사 메모";
   const secondaryLabel = side === "pro" ? "반대측 사전 조사 메모" : "찬성측 사전 조사 메모";
@@ -117,12 +113,7 @@ export function DebateSidePanels({ student, stage, side }: Props) {
             <h2 className="text-sm font-semibold">이번 토론으로 새로 알게 된 사실</h2>
             <p className="text-xs text-muted-foreground mt-0.5">추가로 알게 된 사실을 적어주세요.</p>
           </div>
-          <div className="flex items-center gap-2">
-            {savedAt && <span className="text-xs text-muted-foreground">저장됨 {savedAt}</span>}
-            <Button size="sm" onClick={saveNewFacts} disabled={saving}>
-              {saving ? "저장 중..." : "저장"}
-            </Button>
-          </div>
+          {savedAt && <span className="text-xs text-muted-foreground">자동 저장됨 {savedAt}</span>}
         </div>
         <div className="flex-1 p-3">
           <Textarea

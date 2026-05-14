@@ -1,4 +1,4 @@
-import { createFileRoute, Link, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { useStudent } from "@/lib/student";
 import { supabase } from "@/integrations/supabase/client";
@@ -17,7 +17,6 @@ function Stage5Reflection() {
   const navigate = useNavigate();
   const [report, setReport] = useState("");
   const [saving, setSaving] = useState(false);
-  const [reportSaved, setReportSaved] = useState(false);
   const [note3, setNote3] = useState("");
   const [note4, setNote4] = useState("");
 
@@ -33,13 +32,13 @@ function Stage5Reflection() {
         supabase.from("reflection_notes").select("content")
           .eq("student_id", student.id).eq("stage", 4).maybeSingle(),
       ]);
-      if (reportRes.data?.content) { setReport(reportRes.data.content); setReportSaved(true); }
+      if (reportRes.data?.content) setReport(reportRes.data.content);
       if (n3Res.data?.content) setNote3(n3Res.data.content);
       if (n4Res.data?.content) setNote4(n4Res.data.content);
     })();
   }, [student, navigate]);
 
-  async function save() {
+  async function saveAndGo() {
     if (!student) return;
     if (report.trim().length < 100) return toast.error("최소 100자 이상 작성해 주세요.");
     setSaving(true);
@@ -49,8 +48,7 @@ function Stage5Reflection() {
     );
     setSaving(false);
     if (error) return toast.error("저장 실패: " + error.message);
-    toast.success("저장 완료!");
-    setReportSaved(true);
+    navigate({ to: "/stage5/survey" });
   }
 
   if (!student) return null;
@@ -110,12 +108,9 @@ function Stage5Reflection() {
             </div>
             <div className="flex items-center justify-between border-t px-4 py-3">
               <span className="text-xs text-muted-foreground">{report.length}자</span>
-              <div className="flex gap-2">
-                <Button variant="outline" size="sm" onClick={save} disabled={saving}>{saving ? "저장 중..." : "저장"}</Button>
-                <Link to="/stage5/survey">
-                  <Button size="sm" disabled={!reportSaved}>5-2 사후 설문으로 →</Button>
-                </Link>
-              </div>
+              <Button size="sm" onClick={saveAndGo} disabled={saving}>
+                {saving ? "저장 중..." : "저장하고 5-2 사후 설문으로 →"}
+              </Button>
             </div>
           </div>
         </div>
