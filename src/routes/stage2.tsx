@@ -20,6 +20,7 @@ function Stage2() {
   const [pro, setPro] = useState("");
   const [con, setCon] = useState("");
   const [saving, setSaving] = useState(false);
+  const [researchTurns, setResearchTurns] = useState(0);
 
   useEffect(() => {
     if (student === null) return;
@@ -48,7 +49,7 @@ function Stage2() {
     }, { onConflict: "student_id" });
     setSaving(false);
     if (error) return toast.error("저장 실패: " + error.message);
-    toast.success("저장되었습니다.");
+    if (!next) toast.success("저장되었습니다.");
     if (next) navigate({ to: "/stage3" });
   }
 
@@ -91,9 +92,18 @@ function Stage2() {
                 placeholder="반대 측의 주장, 근거, 사례, 통계 등을 자유롭게 정리해 보세요."
               />
             </div>
-            <div className="flex justify-between">
-              <Button variant="outline" size="sm" onClick={() => save(false)} disabled={saving}>저장만 하기</Button>
-              <Button size="sm" onClick={() => save(true)} disabled={saving}>저장하고 3단계로</Button>
+            <div className="flex items-center justify-end gap-3">
+              <span className={`text-xs ${researchTurns < 5 ? "text-amber-600" : "text-muted-foreground"}`}>
+                AI 자료조사 발언 {researchTurns}/5회
+              </span>
+              <Button
+                size="sm"
+                onClick={() => save(true)}
+                disabled={saving || researchTurns < 5}
+                title={researchTurns < 5 ? "AI 자료조사를 최소 5회 이상 진행해야 합니다." : ""}
+              >
+                {saving ? "이동 중..." : "저장하고 3단계로 →"}
+              </Button>
             </div>
           </div>
 
@@ -105,7 +115,7 @@ function Stage2() {
                 <span className="text-sm font-semibold text-primary">AI 자료 조사 (ChatGPT)</span>
                 <span className="text-[11px] text-muted-foreground">실시간 채팅</span>
               </div>
-              <ResearchChat student={student} />
+              <ResearchChat student={student} onTurnsChange={setResearchTurns} />
             </div>
           </div>
         </div>

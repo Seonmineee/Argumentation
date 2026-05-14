@@ -135,11 +135,14 @@ export function DebateView({
       emptyHint="AI가 첫 발언을 준비하고 있어요..."
       rightSlot={
         <div className="flex flex-wrap items-center justify-between gap-2 text-xs text-muted-foreground">
-          <span>나의 발언 {userTurns}회</span>
+          <span className={userTurns < 5 ? "font-medium text-amber-600" : "font-medium text-emerald-600"}>
+            나의 발언 {userTurns}회 {userTurns < 5 ? `(최소 5회 · 앞으로 ${5 - userTurns}회)` : "✓"}
+          </span>
           <Button
             size="sm"
             onClick={endDebate}
-            disabled={ending || streaming || userTurns === 0}
+            disabled={ending || streaming || userTurns < 5}
+            title={userTurns < 5 ? "최소 5회 이상 발언해야 합니다." : ""}
           >
             {ending ? "이동 중..." : "토론 종료 후 성찰로 →"}
           </Button>
