@@ -9,13 +9,25 @@ import { supabase } from "@/integrations/supabase/client";
 
 const URL = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/research-chat`;
 
-export function ResearchChat({ student }: { student?: StudentSession | null }) {
+export function ResearchChat({
+  student,
+  onTurnsChange,
+}: {
+  student?: StudentSession | null;
+  onTurnsChange?: (n: number) => void;
+}) {
   const givenName = useMemo(() => getGivenName(student?.name), [student?.name]);
   const [messages, setMessages] = useState<ChatMsg[]>([]);
   const [loaded, setLoaded] = useState(false);
   const [input, setInput] = useState("");
   const [loading, setLoading] = useState(false);
   const scrollRef = useRef<HTMLDivElement>(null);
+
+  const userTurns = useMemo(
+    () => messages.filter((m) => m.role === "user").length,
+    [messages],
+  );
+  useEffect(() => { onTurnsChange?.(userTurns); }, [userTurns, onTurnsChange]);
 
   // Load prior conversation so students can resume across sessions
   useEffect(() => {
@@ -88,6 +100,12 @@ export function ResearchChat({ student }: { student?: StudentSession | null }) {
 
   return (
     <div className="flex h-full min-h-0 flex-col">
+      <div className="flex items-center justify-between border-b px-4 py-2 text-xs">
+        <span className="font-medium text-foreground">나의 발언 {userTurns}회</span>
+        <span className={userTurns < 5 ? "text-amber-600" : "text-emerald-600"}>
+          {userTurns < 5 ? `최소 5회 이상 대화하세요 (앞으로 ${5 - userTurns}회)` : "최소 발언 횟수를 채웠어요 ✓"}
+        </span>
+      </div>
       <div ref={scrollRef} className="flex-1 space-y-3 overflow-y-auto px-4 py-3">
         {messages.map((m, i) => (
           <div key={i} className={`flex ${m.role === "user" ? "justify-end" : "justify-start"}`}>
