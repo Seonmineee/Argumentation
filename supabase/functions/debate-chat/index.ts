@@ -139,7 +139,8 @@ function systemPrompt(studentPosition: "pro" | "con", studentName: string) {
   const greetingRule = given
     ? `\n\n### Student Greeting (MANDATORY)\nThe student's full name is "${safeName}". Their given name (이름, 성 제외) is "${given}". Whenever you address the student, you MUST call them "${given}님" — never use the full name or 학생.\nOn your VERY FIRST message only, you MUST begin with "${given}님 안녕하세요~ " and then immediately continue with the mandatory opening sentence: "교육감 선거권 연령을 16세로 낮추는 것이 청소년의 정치 참여와 교육 민주주의 강화에 도움이 될까요, 아니면 아직 적용하기에 이르다고 생각하시나요? 함께 의견을 나눠볼까요?" Do not add any other small talk.\nIn subsequent messages, do not repeat the greeting, but when you direct a question or comment to the student personally, address them as "${given}님" (e.g. "${given}님은 어떻게 생각하시나요?").`
     : "";
-  return base + greetingRule;
+  const turnRule = `\n\n### Minimum Turns (MANDATORY)\n학생이 최소 5회 이상 토론을 이어나가야 합니다. 절대 먼저 토론을 종료하거나 마무리 멘트를 하지 마세요. 학생이 명시적으로 "토론 종료"라고 말하기 전까지는 매 턴마다 새로운 반박·근거·관점을 제시하며 대화가 계속 이어지도록 유도하세요.`;
+  return base + greetingRule + turnRule;
 }
 
 Deno.serve(async (req) => {
