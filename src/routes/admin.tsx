@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { RefreshCw, Download } from "lucide-react";
+import { RefreshCw, Download, Trash2 } from "lucide-react";
 
 export const Route = createFileRoute("/admin")({
   component: AdminPage,
@@ -359,6 +359,38 @@ function AdminPage() {
     downloadCSV(`chat-${safe}.csv`, toCSV(filtered));
   }
 
+  async function deleteStudent(studentId: string, label: string) {
+    const ok = window.confirm(
+      `정말로 [${label}] 학생의 모든 기록(설문/메모/챗/세션/보고서)을 삭제할까요?\n이 작업은 되돌릴 수 없습니다.`
+    );
+    if (!ok) return;
+    const ok2 = window.confirm("마지막 확인: 정말 삭제하시겠습니까?");
+    if (!ok2) return;
+
+    // Collect debate session ids for this student to delete debate_chat rows
+    const { data: sessions } = await supabase
+      .from("debate_sessions")
+      .select("id")
+      .eq("student_id", studentId);
+    const sessionIds = (sessions ?? []).map((s: any) => s.id);
+
+    if (sessionIds.length > 0) {
+      await supabase.from("debate_chat").delete().in("session_id", sessionIds);
+    }
+    await Promise.all([
+      supabase.from("debate_sessions").delete().eq("student_id", studentId),
+      supabase.from("research_chat").delete().eq("student_id", studentId),
+      supabase.from("reflection_chat").delete().eq("student_id", studentId),
+      supabase.from("research_memo").delete().eq("student_id", studentId),
+      supabase.from("debate_notes").delete().eq("student_id", studentId),
+      supabase.from("reflection_notes").delete().eq("student_id", studentId),
+      supabase.from("final_reports").delete().eq("student_id", studentId),
+      supabase.from("surveys").delete().eq("student_id", studentId),
+    ]);
+    await supabase.from("students").delete().eq("id", studentId);
+    await refresh();
+  }
+
   useEffect(() => {
     void refresh();
   }, []);
@@ -435,6 +467,7 @@ function AdminPage() {
                       <th rowSpan={2} className="px-2 py-2">보고서<br />(단어수)</th>
                       <th rowSpan={2} className="px-2 py-2">사후설문</th>
                       <th rowSpan={2} className="px-2 py-2">내보내기</th>
+                      <th rowSpan={2} className="px-2 py-2">삭제</th>
                     </tr>
                     <tr className="border-b text-[11px] text-muted-foreground">
                       <th className="border-x px-2 py-1">메모</th>
@@ -479,6 +512,22 @@ function AdminPage() {
                             title="이 학생의 모든 챗 대화 CSV 다운로드"
                           >
                             <Download className="h-3.5 w-3.5" />
+                          </Button>
+                        </td>
+                        <td className="px-2 py-2 text-center">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() =>
+                              deleteStudent(
+                                r.student.id,
+                                `${r.student.student_number} ${r.student.name ?? ""}`.trim()
+                              )
+                            }
+                            title="이 학생의 모든 기록 삭제"
+                            className="text-rose-600 hover:bg-rose-50 hover:text-rose-700"
+                          >
+                            <Trash2 className="h-3.5 w-3.5" />
                           </Button>
                         </td>
                       </tr>
