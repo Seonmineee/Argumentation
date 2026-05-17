@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
+import { Checkbox } from "@/components/ui/checkbox";
 import { RefreshCw, Download, Trash2 } from "lucide-react";
 
 export const Route = createFileRoute("/admin")({
@@ -348,6 +349,26 @@ function AdminPage() {
   const [loading, setLoading] = useState(true);
   const [refreshedAt, setRefreshedAt] = useState<Date | null>(null);
   const [exporting, setExporting] = useState(false);
+  const [selected, setSelected] = useState<Set<string>>(new Set());
+  const [bulkDeleting, setBulkDeleting] = useState(false);
+
+  function toggleOne(id: string) {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (next.has(id)) next.delete(id);
+      else next.add(id);
+      return next;
+    });
+  }
+
+  function toggleGroup(ids: string[], checked: boolean) {
+    setSelected((prev) => {
+      const next = new Set(prev);
+      if (checked) ids.forEach((id) => next.add(id));
+      else ids.forEach((id) => next.delete(id));
+      return next;
+    });
+  }
 
   async function refresh() {
     setLoading(true);
@@ -385,29 +406,50 @@ function AdminPage() {
     if (!ok) return;
     const ok2 = window.confirm("마지막 확인: 정말 삭제하시겠습니까?");
     if (!ok2) return;
+    await deleteStudentRecords([studentId]);
+    await refresh();
+  }
 
-    // Collect debate session ids for this student to delete debate_chat rows
+  async function deleteStudentRecords(studentIds: string[]) {
+    if (studentIds.length === 0) return;
     const { data: sessions } = await supabase
       .from("debate_sessions")
       .select("id")
-      .eq("student_id", studentId);
+      .in("student_id", studentIds);
     const sessionIds = (sessions ?? []).map((s: any) => s.id);
-
     if (sessionIds.length > 0) {
       await supabase.from("debate_chat").delete().in("session_id", sessionIds);
     }
     await Promise.all([
-      supabase.from("debate_sessions").delete().eq("student_id", studentId),
-      supabase.from("research_chat").delete().eq("student_id", studentId),
-      supabase.from("reflection_chat").delete().eq("student_id", studentId),
-      supabase.from("research_memo").delete().eq("student_id", studentId),
-      supabase.from("debate_notes").delete().eq("student_id", studentId),
-      supabase.from("reflection_notes").delete().eq("student_id", studentId),
-      supabase.from("final_reports").delete().eq("student_id", studentId),
-      supabase.from("surveys").delete().eq("student_id", studentId),
+      supabase.from("debate_sessions").delete().in("student_id", studentIds),
+      supabase.from("research_chat").delete().in("student_id", studentIds),
+      supabase.from("reflection_chat").delete().in("student_id", studentIds),
+      supabase.from("research_memo").delete().in("student_id", studentIds),
+      supabase.from("debate_notes").delete().in("student_id", studentIds),
+      supabase.from("reflection_notes").delete().in("student_id", studentIds),
+      supabase.from("final_reports").delete().in("student_id", studentIds),
+      supabase.from("surveys").delete().in("student_id", studentIds),
     ]);
-    await supabase.from("students").delete().eq("id", studentId);
-    await refresh();
+    await supabase.from("students").delete().in("id", studentIds);
+  }
+
+  async function deleteSelected() {
+    const ids = Array.from(selected);
+    if (ids.length === 0) return;
+    const ok = window.confirm(
+      `선택한 학생 ${ids.length}명의 모든 기록(설문/메모/챗/세션/보고서)을 삭제합니다.\n이 작업은 되돌릴 수 없습니다.`
+    );
+    if (!ok) return;
+    const ok2 = window.confirm(`마지막 확인: ${ids.length}명을 정말 삭제하시겠습니까?`);
+    if (!ok2) return;
+    setBulkDeleting(true);
+    try {
+      await deleteStudentRecords(ids);
+      setSelected(new Set());
+      await refresh();
+    } finally {
+      setBulkDeleting(false);
+    }
   }
 
   useEffect(() => {
@@ -453,6 +495,15 @@ function AdminPage() {
               <Download className={`h-4 w-4 ${exporting ? "animate-pulse" : ""}`} />
               <span className="ml-1">전체 챗 CSV</span>
             </Button>
+            <Button
+              size="sm"
+              variant="destructive"
+              onClick={deleteSelected}
+              disabled={selected.size === 0 || bulkDeleting}
+            >
+              <Trash2 className={`h-4 w-4 ${bulkDeleting ? "animate-pulse" : ""}`} />
+              <span className="ml-1">선택 삭제 ({selected.size})</span>
+            </Button>
           </div>
         </div>
       </header>
@@ -475,6 +526,15 @@ function AdminPage() {
                 <table className="w-full text-sm">
                   <thead className="bg-muted/50 text-xs">
                     <tr className="border-b">
+                      <th rowSpan={2} className="px-2 py-2">
+                        <Checkbox
+                          checked={list.every((r) => selected.has(r.student.id)) && list.length > 0}
+                          onCheckedChange={(c) =>
+                            toggleGroup(list.map((r) => r.student.id), c === true)
+                          }
+                          aria-label="이 반 전체 선택"
+                        />
+                      </th>
                       <th rowSpan={2} className="px-3 py-2 text-left">학번</th>
                       <th rowSpan={2} className="px-3 py-2 text-left">이름</th>
                       <th rowSpan={2} className="px-2 py-2">사전설문</th>
@@ -504,6 +564,13 @@ function AdminPage() {
                   <tbody>
                     {list.map((r) => (
                       <tr key={r.student.id} className="border-b last:border-0 hover:bg-muted/30">
+                        <td className="px-2 py-2 text-center">
+                          <Checkbox
+                            checked={selected.has(r.student.id)}
+                            onCheckedChange={() => toggleOne(r.student.id)}
+                            aria-label={`${r.student.student_number} 선택`}
+                          />
+                        </td>
                         <td className="px-3 py-2 font-mono text-xs">{r.student.student_number}</td>
                         <td className="px-3 py-2">{r.student.name ?? "-"}</td>
                         <td className="px-2 py-2 text-center"><Mark ok={r.pre} /></td>
