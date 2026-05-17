@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { supabase } from "@/integrations/supabase/client";
 import { Button } from "@/components/ui/button";
-import { RefreshCw } from "lucide-react";
+import { RefreshCw, Download } from "lucide-react";
 
 export const Route = createFileRoute("/admin")({
   component: AdminPage,
@@ -39,6 +39,172 @@ function countWords(s: string | null | undefined): number {
 
 function classKey(num: string): string {
   return (num ?? "").trim().slice(0, 3) || "기타";
+}
+
+type ChatRow = {
+  student_number: string;
+  name: string;
+  chatbot: "research" | "debate" | "reflection";
+  stage: number | "";
+  turn_index: number;
+  created_at: string;
+  user_message: string;
+  assistant_message: string;
+};
+
+function csvEscape(v: string | number | null | undefined): string {
+  const s = v === null || v === undefined ? "" : String(v);
+  if (/[",\n\r]/.test(s)) return `"${s.replace(/"/g, '""')}"`;
+  return s;
+}
+
+function toCSV(rows: ChatRow[]): string {
+  const headers = [
+    "student_number",
+    "name",
+    "chatbot",
+    "stage",
+    "turn_index",
+    "created_at",
+    "user_message",
+    "assistant_message",
+  ];
+  const lines = [headers.join(",")];
+  for (const r of rows) {
+    lines.push(
+      [
+        r.student_number,
+        r.name,
+        r.chatbot,
+        r.stage,
+        r.turn_index,
+        r.created_at,
+        r.user_message,
+        r.assistant_message,
+      ]
+        .map(csvEscape)
+        .join(",")
+    );
+  }
+  return "\uFEFF" + lines.join("\n");
+}
+
+function downloadCSV(filename: string, content: string) {
+  const blob = new Blob([content], { type: "text/csv;charset=utf-8;" });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement("a");
+  a.href = url;
+  a.download = filename;
+  document.body.appendChild(a);
+  a.click();
+  document.body.removeChild(a);
+  URL.revokeObjectURL(url);
+}
+
+async function fetchAllChatRows(): Promise<ChatRow[]> {
+  const [studentsRes, sessionsRes, researchRes, debateRes, reflectionRes] =
+    await Promise.all([
+      supabase.from("students").select("id,student_number,name"),
+      supabase.from("debate_sessions").select("id,student_id,stage"),
+      supabase
+        .from("research_chat")
+        .select("student_id,created_at,user_message,assistant_message")
+        .order("created_at", { ascending: true }),
+      supabase
+        .from("debate_chat")
+        .select("session_id,created_at,user_message,assistant_message")
+        .order("created_at", { ascending: true }),
+      supabase
+        .from("reflection_chat")
+        .select("student_id,stage,created_at,user_message,assistant_message")
+        .order("created_at", { ascending: true }),
+    ]);
+
+  const studentMap = new Map<string, { student_number: string; name: string }>();
+  for (const s of (studentsRes.data ?? []) as Student[]) {
+    studentMap.set(s.id, {
+      student_number: s.student_number ?? "",
+      name: s.name ?? "",
+    });
+  }
+
+  const sessionMap = new Map<string, { student_id: string; stage: number }>();
+  for (const s of sessionsRes.data ?? []) {
+    sessionMap.set(s.id, { student_id: s.student_id, stage: s.stage });
+  }
+
+  const rows: ChatRow[] = [];
+  const turnCounter = new Map<string, number>();
+
+  function nextTurn(key: string): number {
+    const n = (turnCounter.get(key) ?? 0) + 1;
+    turnCounter.set(key, n);
+    return n;
+  }
+
+  for (const r of researchRes.data ?? []) {
+    const st = studentMap.get(r.student_id);
+    if (!st) continue;
+    rows.push({
+      student_number: st.student_number,
+      name: st.name,
+      chatbot: "research",
+      stage: "",
+      turn_index: nextTurn(`${r.student_id}::research`),
+      created_at: r.created_at,
+      user_message: r.user_message ?? "",
+      assistant_message: r.assistant_message ?? "",
+    });
+  }
+
+  for (const r of debateRes.data ?? []) {
+    const meta = sessionMap.get(r.session_id);
+    if (!meta) continue;
+    const st = studentMap.get(meta.student_id);
+    if (!st) continue;
+    rows.push({
+      student_number: st.student_number,
+      name: st.name,
+      chatbot: "debate",
+      stage: meta.stage,
+      turn_index: nextTurn(`${meta.student_id}::debate::${meta.stage}`),
+      created_at: r.created_at,
+      user_message: r.user_message ?? "",
+      assistant_message: r.assistant_message ?? "",
+    });
+  }
+
+  for (const r of reflectionRes.data ?? []) {
+    const st = studentMap.get(r.student_id);
+    if (!st) continue;
+    rows.push({
+      student_number: st.student_number,
+      name: st.name,
+      chatbot: "reflection",
+      stage: r.stage,
+      turn_index: nextTurn(`${r.student_id}::reflection::${r.stage}`),
+      created_at: r.created_at,
+      user_message: r.user_message ?? "",
+      assistant_message: r.assistant_message ?? "",
+    });
+  }
+
+  const chatOrder: Record<ChatRow["chatbot"], number> = {
+    research: 0,
+    debate: 1,
+    reflection: 2,
+  };
+  rows.sort((a, b) => {
+    if (a.student_number !== b.student_number)
+      return a.student_number.localeCompare(b.student_number);
+    if (a.chatbot !== b.chatbot) return chatOrder[a.chatbot] - chatOrder[b.chatbot];
+    const sa = a.stage === "" ? -1 : a.stage;
+    const sb = b.stage === "" ? -1 : b.stage;
+    if (sa !== sb) return sa - sb;
+    return a.created_at.localeCompare(b.created_at);
+  });
+
+  return rows;
 }
 
 async function loadAll(): Promise<Row[]> {
@@ -162,6 +328,7 @@ function AdminPage() {
   const [rows, setRows] = useState<Row[]>([]);
   const [loading, setLoading] = useState(true);
   const [refreshedAt, setRefreshedAt] = useState<Date | null>(null);
+  const [exporting, setExporting] = useState(false);
 
   async function refresh() {
     setLoading(true);
@@ -172,6 +339,24 @@ function AdminPage() {
     } finally {
       setLoading(false);
     }
+  }
+
+  async function exportAll() {
+    setExporting(true);
+    try {
+      const all = await fetchAllChatRows();
+      const ts = new Date().toISOString().slice(0, 19).replace(/[:T]/g, "-");
+      downloadCSV(`chat-all-by-student-${ts}.csv`, toCSV(all));
+    } finally {
+      setExporting(false);
+    }
+  }
+
+  async function exportStudent(studentNumber: string, name: string | null) {
+    const all = await fetchAllChatRows();
+    const filtered = all.filter((r) => r.student_number === studentNumber);
+    const safe = `${studentNumber}_${(name ?? "").replace(/[^\w가-힣]+/g, "")}`;
+    downloadCSV(`chat-${safe}.csv`, toCSV(filtered));
   }
 
   useEffect(() => {
@@ -213,6 +398,10 @@ function AdminPage() {
               <RefreshCw className={`h-4 w-4 ${loading ? "animate-spin" : ""}`} />
               <span className="ml-1">새로고침</span>
             </Button>
+            <Button size="sm" variant="outline" onClick={exportAll} disabled={exporting}>
+              <Download className={`h-4 w-4 ${exporting ? "animate-pulse" : ""}`} />
+              <span className="ml-1">전체 챗 CSV</span>
+            </Button>
           </div>
         </div>
       </header>
@@ -245,6 +434,7 @@ function AdminPage() {
                       <th colSpan={2} className="border-x px-2 py-1">4-2 성찰</th>
                       <th rowSpan={2} className="px-2 py-2">보고서<br />(단어수)</th>
                       <th rowSpan={2} className="px-2 py-2">사후설문</th>
+                      <th rowSpan={2} className="px-2 py-2">내보내기</th>
                     </tr>
                     <tr className="border-b text-[11px] text-muted-foreground">
                       <th className="border-x px-2 py-1">메모</th>
@@ -281,6 +471,16 @@ function AdminPage() {
                           </span>
                         </td>
                         <td className="px-2 py-2 text-center"><Mark ok={r.post} /></td>
+                        <td className="px-2 py-2 text-center">
+                          <Button
+                            size="sm"
+                            variant="ghost"
+                            onClick={() => exportStudent(r.student.student_number, r.student.name)}
+                            title="이 학생의 모든 챗 대화 CSV 다운로드"
+                          >
+                            <Download className="h-3.5 w-3.5" />
+                          </Button>
+                        </td>
                       </tr>
                     ))}
                   </tbody>
