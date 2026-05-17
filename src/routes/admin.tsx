@@ -44,7 +44,12 @@ function classKey(num: string): string {
 type ChatRow = {
   student_number: string;
   name: string;
-  chatbot: "research" | "debate" | "reflection";
+  chatbot:
+    | "research_chat"
+    | "debate_chat_1"
+    | "debate_chat_2"
+    | "reflection_chat_1"
+    | "reflection_chat_2";
   stage: number | "";
   turn_index: number;
   created_at: string;
@@ -148,7 +153,7 @@ async function fetchAllChatRows(): Promise<ChatRow[]> {
     rows.push({
       student_number: st.student_number,
       name: st.name,
-      chatbot: "research",
+      chatbot: "research_chat",
       stage: "",
       turn_index: nextTurn(`${r.student_id}::research`),
       created_at: r.created_at,
@@ -162,10 +167,16 @@ async function fetchAllChatRows(): Promise<ChatRow[]> {
     if (!meta) continue;
     const st = studentMap.get(meta.student_id);
     if (!st) continue;
+    const label =
+      meta.stage === 3
+        ? "debate_chat_1"
+        : meta.stage === 4
+        ? "debate_chat_2"
+        : ("debate_chat_1" as const);
     rows.push({
       student_number: st.student_number,
       name: st.name,
-      chatbot: "debate",
+      chatbot: label,
       stage: meta.stage,
       turn_index: nextTurn(`${meta.student_id}::debate::${meta.stage}`),
       created_at: r.created_at,
@@ -177,10 +188,16 @@ async function fetchAllChatRows(): Promise<ChatRow[]> {
   for (const r of reflectionRes.data ?? []) {
     const st = studentMap.get(r.student_id);
     if (!st) continue;
+    const label =
+      r.stage === 3
+        ? "reflection_chat_1"
+        : r.stage === 4
+        ? "reflection_chat_2"
+        : ("reflection_chat_1" as const);
     rows.push({
       student_number: st.student_number,
       name: st.name,
-      chatbot: "reflection",
+      chatbot: label,
       stage: r.stage,
       turn_index: nextTurn(`${r.student_id}::reflection::${r.stage}`),
       created_at: r.created_at,
@@ -190,9 +207,11 @@ async function fetchAllChatRows(): Promise<ChatRow[]> {
   }
 
   const chatOrder: Record<ChatRow["chatbot"], number> = {
-    research: 0,
-    debate: 1,
-    reflection: 2,
+    research_chat: 0,
+    debate_chat_1: 1,
+    reflection_chat_1: 2,
+    debate_chat_2: 3,
+    reflection_chat_2: 4,
   };
   rows.sort((a, b) => {
     if (a.student_number !== b.student_number)
