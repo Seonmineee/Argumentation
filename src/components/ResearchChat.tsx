@@ -46,10 +46,19 @@ export function ResearchChat({
         if (m.assistant_message) expanded.push({ role: "assistant", content: m.assistant_message });
       }
       if (expanded.length === 0) {
-        expanded.push({
-          role: "assistant",
-          content: givenName ? `${givenName}님 안녕하세요?` : "안녕하세요?",
-        });
+        const greeting = givenName ? `${givenName}님 안녕하세요?` : "안녕하세요?";
+        expanded.push({ role: "assistant", content: greeting });
+        // Persist the initial greeting so it appears in exports/data
+        supabase
+          .from("research_chat")
+          .insert({
+            student_id: student.id,
+            user_message: null,
+            assistant_message: greeting,
+          })
+          .then(({ error }) => {
+            if (error) console.error("save greeting", error);
+          });
       }
       setMessages(expanded);
       setLoaded(true);
