@@ -230,9 +230,11 @@ async function loadAll(): Promise<Row[]> {
     memosRes,
     researchChatRes,
     sessionsRes,
-    debateChatRes,
+    debate1ChatRes,
+    debate2ChatRes,
     reflNotesRes,
-    reflChatRes,
+    refl1ChatRes,
+    refl2ChatRes,
     reportsRes,
   ] = await Promise.all([
     supabase.from("students").select("id,student_number,name"),
@@ -240,9 +242,11 @@ async function loadAll(): Promise<Row[]> {
     supabase.from("research_memo").select("student_id"),
     supabase.from("research_chat").select("student_id,user_message"),
     supabase.from("debate_sessions").select("id,student_id,stage,status"),
-    supabase.from("debate_chat").select("session_id,user_message"),
+    supabase.from("debate_1_chat").select("student_id,user_message"),
+    supabase.from("debate_2_chat").select("student_id,user_message"),
     supabase.from("reflection_notes").select("student_id,stage"),
-    supabase.from("reflection_chat").select("student_id,stage,user_message"),
+    supabase.from("reflection_1_chat").select("student_id,user_message"),
+    supabase.from("reflection_2_chat").select("student_id,user_message"),
     supabase.from("final_reports").select("student_id,content"),
   ]);
 
@@ -275,11 +279,14 @@ async function loadAll(): Promise<Row[]> {
 
   // (student_id, stage) -> turn count
   const debateTurnMap = new Map<string, number>();
-  for (const m of debateChatRes.data ?? []) {
+  for (const m of (debate1ChatRes.data ?? []) as Array<{ student_id: string; user_message: string | null }>) {
     if (!m.user_message || !m.user_message.trim()) continue;
-    const meta = sessionMeta.get(m.session_id);
-    if (!meta) continue;
-    const k = `${meta.student_id}::${meta.stage}`;
+    const k = `${m.student_id}::3`;
+    debateTurnMap.set(k, (debateTurnMap.get(k) ?? 0) + 1);
+  }
+  for (const m of (debate2ChatRes.data ?? []) as Array<{ student_id: string; user_message: string | null }>) {
+    if (!m.user_message || !m.user_message.trim()) continue;
+    const k = `${m.student_id}::4`;
     debateTurnMap.set(k, (debateTurnMap.get(k) ?? 0) + 1);
   }
   const debateEndedMap = new Map<string, boolean>();
@@ -294,9 +301,14 @@ async function loadAll(): Promise<Row[]> {
   }
 
   const reflTurnMap = new Map<string, number>();
-  for (const r of reflChatRes.data ?? []) {
+  for (const r of (refl1ChatRes.data ?? []) as Array<{ student_id: string; user_message: string | null }>) {
     if (!r.user_message || !r.user_message.trim()) continue;
-    const k = `${r.student_id}::${r.stage}`;
+    const k = `${r.student_id}::3`;
+    reflTurnMap.set(k, (reflTurnMap.get(k) ?? 0) + 1);
+  }
+  for (const r of (refl2ChatRes.data ?? []) as Array<{ student_id: string; user_message: string | null }>) {
+    if (!r.user_message || !r.user_message.trim()) continue;
+    const k = `${r.student_id}::4`;
     reflTurnMap.set(k, (reflTurnMap.get(k) ?? 0) + 1);
   }
 
@@ -408,18 +420,13 @@ function AdminPage() {
 
   async function deleteStudentRecords(studentIds: string[]) {
     if (studentIds.length === 0) return;
-    const { data: sessions } = await supabase
-      .from("debate_sessions")
-      .select("id")
-      .in("student_id", studentIds);
-    const sessionIds = (sessions ?? []).map((s: any) => s.id);
-    if (sessionIds.length > 0) {
-      await supabase.from("debate_chat").delete().in("session_id", sessionIds);
-    }
     await Promise.all([
+      supabase.from("debate_1_chat").delete().in("student_id", studentIds),
+      supabase.from("debate_2_chat").delete().in("student_id", studentIds),
       supabase.from("debate_sessions").delete().in("student_id", studentIds),
       supabase.from("research_chat").delete().in("student_id", studentIds),
-      supabase.from("reflection_chat").delete().in("student_id", studentIds),
+      supabase.from("reflection_1_chat").delete().in("student_id", studentIds),
+      supabase.from("reflection_2_chat").delete().in("student_id", studentIds),
       supabase.from("research_memo").delete().in("student_id", studentIds),
       supabase.from("debate_notes").delete().in("student_id", studentIds),
       supabase.from("reflection_notes").delete().in("student_id", studentIds),
