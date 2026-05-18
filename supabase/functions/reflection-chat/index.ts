@@ -12,11 +12,19 @@ function givenNameFrom(fullName: string): string {
   return n;
 }
 
-function systemPrompt(studentPosition: "pro" | "con", debateTranscript: string, studentName: string) {
+function systemPrompt(
+  studentPosition: "pro" | "con",
+  debateTranscript: string,
+  studentName: string,
+  previousDebateTranscript?: string,
+) {
   const studentSide = studentPosition === "pro" ? "찬성" : "반대";
   const given = givenNameFrom(studentName);
   const nameRule = given
     ? `\n\n### Student Name (MANDATORY)\nThe student's full name is "${studentName}". Their given name (이름, 성 제외) is "${given}". Whenever you address the student, you MUST call them "${given}님" — never use the full name or 학생. Use "${given}님" naturally throughout the reflection (e.g. "${given}님은 이 부분을 어떻게 보셨나요?").`
+    : "";
+  const previousBlock = previousDebateTranscript
+    ? `\n\n[이전(1차) 토론 전사 — 비교용]\n"""\n${previousDebateTranscript}\n"""\n\n### 비교 성찰 (MANDATORY when previous debate exists)\n학생이 1차 토론 대비 2차 토론에서 어떤 부분이 나아졌는지, 어떤 부분이 여전히 부족한지 묻거나 언급할 수 있습니다. 루브릭의 동일 차원을 두 토론에서 비교하며 구체적 변화(예: "1차에서는 ___였는데, 2차에서는 ___로 발전했어요")를 짚어 주세요.`
     : "";
   return `You are an AI designed to support reflection on the argumentation of high school students about the voting age for superintendent elections, not to participate in debate.
 
@@ -139,14 +147,14 @@ ${given ? `"${given}님, 토론 기록과 토론 루브릭을 바탕으로, 논�
 [학생-ChatGPT 토론 전사]
 """
 ${debateTranscript}
-"""${nameRule}`;
+"""${previousBlock}${nameRule}`;
 }
 
 Deno.serve(async (req) => {
   if (req.method === "OPTIONS") return new Response(null, { headers: corsHeaders });
 
   try {
-    const { messages, studentPosition, debateTranscript, studentName } = await req.json();
+    const { messages, studentPosition, debateTranscript, studentName, previousDebateTranscript } = await req.json();
     const LOVABLE_API_KEY = Deno.env.get("LOVABLE_API_KEY");
     if (!LOVABLE_API_KEY) throw new Error("LOVABLE_API_KEY not set");
 
@@ -159,7 +167,7 @@ Deno.serve(async (req) => {
       body: JSON.stringify({
         model: "openai/gpt-5.5",
         messages: [
-          { role: "system", content: systemPrompt(studentPosition, debateTranscript ?? "", studentName ?? "") },
+          { role: "system", content: systemPrompt(studentPosition, debateTranscript ?? "", studentName ?? "", previousDebateTranscript) },
           ...messages,
         ],
         stream: true,
