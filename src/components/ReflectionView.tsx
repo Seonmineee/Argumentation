@@ -22,6 +22,8 @@ export function ReflectionView({
   nextHref: "/stage4" | "/stage5/reflection";
   nextLabel: string;
 }) {
+  const debateTable = stage === 3 ? "debate_1_chat" : "debate_2_chat";
+  const reflTable = stage === 3 ? "reflection_1_chat" : "reflection_2_chat";
   const [messages, setMessages] = useState<ChatMsg[]>([]);
   const [transcript, setTranscript] = useState<string>("");
   const [debateMsgs, setDebateMsgs] = useState<{ role: string; content: string }[]>([]);
@@ -41,10 +43,10 @@ export function ReflectionView({
         .select("id").eq("student_id", student.id).eq("stage", stage).maybeSingle();
       if (!sess) { setLoaded(true); return; }
 
-      const { data: dmsgs } = await supabase.from("debate_chat")
+      const { data: dmsgs } = await supabase.from(debateTable)
         .select("user_message,assistant_message").eq("session_id", sess.id).order("created_at");
       const list: { role: string; content: string }[] = [];
-      for (const m of dmsgs ?? []) {
+      for (const m of (dmsgs ?? []) as Array<{ user_message: string | null; assistant_message: string | null }>) {
         if (m.user_message) list.push({ role: "user", content: m.user_message });
         if (m.assistant_message) list.push({ role: "assistant", content: m.assistant_message });
       }
@@ -56,11 +58,11 @@ export function ReflectionView({
         .join("\n\n");
       setTranscript(tr);
 
-      const { data: rmsgs } = await supabase.from("reflection_chat")
-        .select("user_message,assistant_message").eq("student_id", student.id).eq("stage", stage)
+      const { data: rmsgs } = await supabase.from(reflTable)
+        .select("user_message,assistant_message").eq("student_id", student.id)
         .order("created_at");
       const expanded: ChatMsg[] = [];
-      for (const m of rmsgs ?? []) {
+      for (const m of (rmsgs ?? []) as Array<{ user_message: string | null; assistant_message: string | null }>) {
         if (m.user_message) expanded.push({ role: "user", content: m.user_message });
         if (m.assistant_message) expanded.push({ role: "assistant", content: m.assistant_message });
       }
@@ -71,7 +73,7 @@ export function ReflectionView({
       if (noteRow?.content) setNote(noteRow.content);
       setLoaded(true);
     })();
-  }, [student.id, stage]);
+  }, [student.id, stage, debateTable, reflTable]);
 
   const callAI = useCallback(async (history: ChatMsg[], tr: string, userText: string | null) => {
     setStreaming(true);
@@ -91,9 +93,11 @@ export function ReflectionView({
       onDone: async () => {
         setStreaming(false);
         if (acc) {
-          await supabase.from("reflection_chat").insert({
+          await supabase.from(reflTable).insert({
             student_id: student.id,
-            stage,
+            student_number: student.student_number ?? null,
+            name: student.name ?? null,
+            phone_last4: student.phone_last4 ?? null,
             user_message: userText,
             assistant_message: acc,
           });
@@ -105,7 +109,7 @@ export function ReflectionView({
         toast.error(message);
       },
     });
-  }, [student.id, stage, studentPosition]);
+  }, [student.id, stage, studentPosition, student.name, student.student_number, student.phone_last4, reflTable]);
 
   useEffect(() => {
     if (!loaded || !hasDebate || messages.length > 0 || initStarted.current) return;

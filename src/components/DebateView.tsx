@@ -19,6 +19,7 @@ export function DebateView({
   reflectionHref: "/stage3/reflection" | "/stage4/reflection";
 }) {
   const navigate = useNavigate();
+  const chatTable = stage === 3 ? "debate_1_chat" : "debate_2_chat";
   const [sessionId, setSessionId] = useState<string | null>(null);
   const [messages, setMessages] = useState<ChatMsg[]>([]);
   const [streaming, setStreaming] = useState(false);
@@ -45,19 +46,19 @@ export function DebateView({
         sid = created.id;
       }
 
-      const { data: msgs } = await supabase.from("debate_chat")
+      const { data: msgs } = await supabase.from(chatTable)
         .select("user_message,assistant_message").eq("session_id", sid!).order("created_at");
 
       setSessionId(sid!);
       const expanded: ChatMsg[] = [];
-      for (const m of msgs ?? []) {
+      for (const m of (msgs ?? []) as Array<{ user_message: string | null; assistant_message: string | null }>) {
         if (m.user_message) expanded.push({ role: "user", content: m.user_message });
         if (m.assistant_message) expanded.push({ role: "assistant", content: m.assistant_message });
       }
       setMessages(expanded);
       setLoaded(true);
     })();
-  }, [student.id, stage, studentPosition]);
+  }, [student.id, stage, studentPosition, chatTable]);
 
   const callAI = useCallback(async (history: ChatMsg[], sid: string, userText: string | null) => {
     setStreaming(true);
@@ -77,8 +78,12 @@ export function DebateView({
       onDone: async () => {
         setStreaming(false);
         if (acc) {
-          await supabase.from("debate_chat").insert({
+          await supabase.from(chatTable).insert({
             session_id: sid,
+            student_id: student.id,
+            student_number: student.student_number ?? null,
+            name: student.name ?? null,
+            phone_last4: student.phone_last4 ?? null,
             user_message: userText,
             assistant_message: acc,
           });
@@ -90,7 +95,7 @@ export function DebateView({
         toast.error(message);
       },
     });
-  }, [studentPosition, student.name]);
+  }, [studentPosition, student.name, student.id, student.student_number, student.phone_last4, chatTable]);
 
   // Auto-greet if no messages
   useEffect(() => {

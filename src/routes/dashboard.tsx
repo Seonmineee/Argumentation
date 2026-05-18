@@ -30,23 +30,23 @@ function Dashboard() {
     if (!student) { navigate({ to: "/" }); return; }
     (async () => {
       const sid = student.id;
-      const [surveys, research, sessions, refls, report] = await Promise.all([
+      const [surveys, research, sessions, refl1, refl2, report] = await Promise.all([
         supabase.from("surveys").select("survey_type").eq("student_id", sid),
         supabase.from("research_memo").select("id").eq("student_id", sid).maybeSingle(),
         supabase.from("debate_sessions").select("stage,status").eq("student_id", sid),
-        supabase.from("reflection_chat").select("stage").eq("student_id", sid),
+        supabase.from("reflection_1_chat").select("id").eq("student_id", sid).limit(1),
+        supabase.from("reflection_2_chat").select("id").eq("student_id", sid).limit(1),
         supabase.from("final_reports").select("id").eq("student_id", sid).maybeSingle(),
       ]);
       const types = new Set((surveys.data ?? []).map((r) => r.survey_type));
       const sess = sessions.data ?? [];
-      const reflStages = new Set((refls.data ?? []).map((r) => r.stage));
       setP({
         pre: types.has("pre"),
         research: !!research.data,
         debate3Ended: sess.some((s) => s.stage === 3 && s.status === "ended"),
-        reflection3: reflStages.has(3),
+        reflection3: (refl1.data ?? []).length > 0,
         debate4Ended: sess.some((s) => s.stage === 4 && s.status === "ended"),
-        reflection4: reflStages.has(4),
+        reflection4: (refl2.data ?? []).length > 0,
         report: !!report.data,
         post: types.has("post"),
       });

@@ -53,6 +53,9 @@ export function ResearchChat({
           .from("research_chat")
           .insert({
             student_id: student.id,
+            student_number: student.student_number ?? null,
+            name: student.name ?? null,
+            phone_last4: student.phone_last4 ?? null,
             user_message: null,
             assistant_message: greeting,
           })
@@ -94,6 +97,9 @@ export function ResearchChat({
         if (student?.id && acc) {
           supabase.from("research_chat").insert({
             student_id: student.id,
+            student_number: student.student_number ?? null,
+            name: student.name ?? null,
+            phone_last4: student.phone_last4 ?? null,
             user_message: text,
             assistant_message: acc,
           }).then(({ error }) => { if (error) console.error("save turn", error); });
