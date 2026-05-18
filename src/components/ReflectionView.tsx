@@ -38,13 +38,10 @@ export function ReflectionView({
 
   useEffect(() => {
     (async () => {
-      // Load debate session for this stage (no longer requires "ended" status)
-      const { data: sess } = await supabase.from("debate_sessions")
-        .select("id").eq("student_id", student.id).eq("stage", stage).maybeSingle();
-      if (!sess) { setLoaded(true); return; }
-
       const { data: dmsgs } = await supabase.from(debateTable)
-        .select("user_message,assistant_message").eq("session_id", sess.id).order("created_at");
+        .select("user_message,assistant_message")
+        .eq("student_id", student.id)
+        .order("created_at");
       const list: { role: string; content: string }[] = [];
       for (const m of (dmsgs ?? []) as Array<{ user_message: string | null; assistant_message: string | null }>) {
         if (m.user_message) list.push({ role: "user", content: m.user_message });
