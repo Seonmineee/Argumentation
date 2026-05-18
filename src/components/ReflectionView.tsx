@@ -26,6 +26,7 @@ export function ReflectionView({
   const reflTable = stage === 3 ? "reflection_1_chat" : "reflection_2_chat";
   const [messages, setMessages] = useState<ChatMsg[]>([]);
   const [transcript, setTranscript] = useState<string>("");
+  const [prevTranscript, setPrevTranscript] = useState<string>("");
   const [debateMsgs, setDebateMsgs] = useState<{ role: string; content: string }[]>([]);
   const [streaming, setStreaming] = useState(false);
   const [loaded, setLoaded] = useState(false);
@@ -61,6 +62,24 @@ export function ReflectionView({
         .map((m) => `${m.role === "user" ? "[학생]" : "[AI]"} ${m.content}`)
         .join("\n\n");
       setTranscript(tr);
+
+      // For stage 4 reflection, also load the 1st debate transcript for comparison.
+      if (stage === 4) {
+        const { data: prev } = await supabase
+          .from("debate_1_chat")
+          .select("user_message,assistant_message")
+          .eq("student_id", student.id)
+          .order("created_at");
+        const prevList: string[] = [];
+        for (const m of (prev ?? []) as Array<{
+          user_message: string | null;
+          assistant_message: string | null;
+        }>) {
+          if (m.user_message) prevList.push(`[학생] ${m.user_message}`);
+          if (m.assistant_message) prevList.push(`[AI] ${m.assistant_message}`);
+        }
+        if (prevList.length > 0) setPrevTranscript(prevList.join("\n\n"));
+      }
 
       const { data: rmsgs } = await supabase
         .from(reflTable)
@@ -100,6 +119,7 @@ export function ReflectionView({
           studentPosition,
           debateTranscript: tr,
           studentName: student.name ?? "",
+          previousDebateTranscript: stage === 4 ? prevTranscript : undefined,
         },
         onDelta: (d) => {
           acc += d;
@@ -137,6 +157,7 @@ export function ReflectionView({
       student.student_number,
       student.phone_last4,
       reflTable,
+      prevTranscript,
     ],
   );
 
