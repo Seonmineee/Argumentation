@@ -108,21 +108,28 @@ function downloadCSV(filename: string, content: string) {
 }
 
 async function fetchAllChatRows(): Promise<ChatRow[]> {
-  const [studentsRes, sessionsRes, researchRes, debateRes, reflectionRes] =
+  const [studentsRes, researchRes, debate1Res, debate2Res, refl1Res, refl2Res] =
     await Promise.all([
       supabase.from("students").select("id,student_number,name"),
-      supabase.from("debate_sessions").select("id,student_id,stage"),
       supabase
         .from("research_chat")
-        .select("student_id,created_at,user_message,assistant_message")
+        .select("student_id,student_number,name,created_at,user_message,assistant_message")
         .order("created_at", { ascending: true }),
       supabase
-        .from("debate_chat")
-        .select("session_id,created_at,user_message,assistant_message")
+        .from("debate_1_chat")
+        .select("student_id,student_number,name,created_at,user_message,assistant_message")
         .order("created_at", { ascending: true }),
       supabase
-        .from("reflection_chat")
-        .select("student_id,stage,created_at,user_message,assistant_message")
+        .from("debate_2_chat")
+        .select("student_id,student_number,name,created_at,user_message,assistant_message")
+        .order("created_at", { ascending: true }),
+      supabase
+        .from("reflection_1_chat")
+        .select("student_id,student_number,name,created_at,user_message,assistant_message")
+        .order("created_at", { ascending: true }),
+      supabase
+        .from("reflection_2_chat")
+        .select("student_id,student_number,name,created_at,user_message,assistant_message")
         .order("created_at", { ascending: true }),
     ]);
 
@@ -132,11 +139,6 @@ async function fetchAllChatRows(): Promise<ChatRow[]> {
       student_number: s.student_number ?? "",
       name: s.name ?? "",
     });
-  }
-
-  const sessionMap = new Map<string, { student_id: string; stage: number }>();
-  for (const s of sessionsRes.data ?? []) {
-    sessionMap.set(s.id, { student_id: s.student_id, stage: s.stage });
   }
 
   const rows: ChatRow[] = [];
@@ -149,8 +151,10 @@ async function fetchAllChatRows(): Promise<ChatRow[]> {
   }
 
   for (const r of researchRes.data ?? []) {
-    const st = studentMap.get(r.student_id);
-    if (!st) continue;
+    const st = studentMap.get(r.student_id) ?? {
+      student_number: r.student_number ?? "",
+      name: r.name ?? "",
+    };
     rows.push({
       student_number: st.student_number,
       name: st.name,
@@ -163,49 +167,41 @@ async function fetchAllChatRows(): Promise<ChatRow[]> {
     });
   }
 
-  for (const r of debateRes.data ?? []) {
-    const meta = sessionMap.get(r.session_id);
-    if (!meta) continue;
-    const st = studentMap.get(meta.student_id);
-    if (!st) continue;
-    const label =
-      meta.stage === 3
-        ? "debate_chat_1"
-        : meta.stage === 4
-        ? "debate_chat_2"
-        : ("debate_chat_1" as const);
-    rows.push({
-      student_number: st.student_number,
-      name: st.name,
-      chatbot: label,
-      stage: meta.stage,
-      turn_index: nextTurn(`${meta.student_id}::debate::${meta.stage}`),
-      created_at: r.created_at,
-      user_message: r.user_message ?? "",
-      assistant_message: r.assistant_message ?? "",
-    });
-  }
+  const pushStageRows = (
+    data: Array<{
+      student_id: string;
+      student_number: string | null;
+      name: string | null;
+      created_at: string;
+      user_message: string | null;
+      assistant_message: string | null;
+    }> | null | undefined,
+    chatbot: ChatRow["chatbot"],
+    stage: number,
+    turnKey: string,
+  ) => {
+    for (const r of data ?? []) {
+      const st = studentMap.get(r.student_id) ?? {
+        student_number: r.student_number ?? "",
+        name: r.name ?? "",
+      };
+      rows.push({
+        student_number: st.student_number,
+        name: st.name,
+        chatbot,
+        stage,
+        turn_index: nextTurn(`${r.student_id}::${turnKey}`),
+        created_at: r.created_at,
+        user_message: r.user_message ?? "",
+        assistant_message: r.assistant_message ?? "",
+      });
+    }
+  };
 
-  for (const r of reflectionRes.data ?? []) {
-    const st = studentMap.get(r.student_id);
-    if (!st) continue;
-    const label =
-      r.stage === 3
-        ? "reflection_chat_1"
-        : r.stage === 4
-        ? "reflection_chat_2"
-        : ("reflection_chat_1" as const);
-    rows.push({
-      student_number: st.student_number,
-      name: st.name,
-      chatbot: label,
-      stage: r.stage,
-      turn_index: nextTurn(`${r.student_id}::reflection::${r.stage}`),
-      created_at: r.created_at,
-      user_message: r.user_message ?? "",
-      assistant_message: r.assistant_message ?? "",
-    });
-  }
+  pushStageRows(debate1Res.data as any, "debate_chat_1", 3, "debate::3");
+  pushStageRows(debate2Res.data as any, "debate_chat_2", 4, "debate::4");
+  pushStageRows(refl1Res.data as any, "reflection_chat_1", 3, "reflection::3");
+  pushStageRows(refl2Res.data as any, "reflection_chat_2", 4, "reflection::4");
 
   const chatOrder: Record<ChatRow["chatbot"], number> = {
     research_chat: 0,
