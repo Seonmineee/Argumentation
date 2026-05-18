@@ -14,14 +14,18 @@ export type Database = {
   }
   public: {
     Tables: {
-      debate_chat: {
+      debate_1_chat: {
         Row: {
           assistant_message: string | null
           content: string | null
           created_at: string
           id: string
+          name: string | null
+          phone_last4: string | null
           role: string | null
           session_id: string
+          student_id: string
+          student_number: string | null
           user_message: string | null
         }
         Insert: {
@@ -29,8 +33,12 @@ export type Database = {
           content?: string | null
           created_at?: string
           id?: string
+          name?: string | null
+          phone_last4?: string | null
           role?: string | null
           session_id: string
+          student_id: string
+          student_number?: string | null
           user_message?: string | null
         }
         Update: {
@@ -38,26 +46,57 @@ export type Database = {
           content?: string | null
           created_at?: string
           id?: string
+          name?: string | null
+          phone_last4?: string | null
           role?: string | null
           session_id?: string
+          student_id?: string
+          student_number?: string | null
           user_message?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "debate_messages_session_id_fkey"
-            columns: ["session_id"]
-            isOneToOne: false
-            referencedRelation: "debate_sessions"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "debate_messages_session_id_fkey"
-            columns: ["session_id"]
-            isOneToOne: false
-            referencedRelation: "debate_sessions_view"
-            referencedColumns: ["session_id"]
-          },
-        ]
+        Relationships: []
+      }
+      debate_2_chat: {
+        Row: {
+          assistant_message: string | null
+          content: string | null
+          created_at: string
+          id: string
+          name: string | null
+          phone_last4: string | null
+          role: string | null
+          session_id: string
+          student_id: string
+          student_number: string | null
+          user_message: string | null
+        }
+        Insert: {
+          assistant_message?: string | null
+          content?: string | null
+          created_at?: string
+          id?: string
+          name?: string | null
+          phone_last4?: string | null
+          role?: string | null
+          session_id: string
+          student_id: string
+          student_number?: string | null
+          user_message?: string | null
+        }
+        Update: {
+          assistant_message?: string | null
+          content?: string | null
+          created_at?: string
+          id?: string
+          name?: string | null
+          phone_last4?: string | null
+          role?: string | null
+          session_id?: string
+          student_id?: string
+          student_number?: string | null
+          user_message?: string | null
+        }
+        Relationships: []
       }
       debate_notes: {
         Row: {
@@ -158,15 +197,17 @@ export type Database = {
           },
         ]
       }
-      reflection_chat: {
+      reflection_1_chat: {
         Row: {
           assistant_message: string | null
           content: string | null
           created_at: string
           id: string
+          name: string | null
+          phone_last4: string | null
           role: string | null
-          stage: number
           student_id: string
+          student_number: string | null
           user_message: string | null
         }
         Insert: {
@@ -174,9 +215,11 @@ export type Database = {
           content?: string | null
           created_at?: string
           id?: string
+          name?: string | null
+          phone_last4?: string | null
           role?: string | null
-          stage: number
           student_id: string
+          student_number?: string | null
           user_message?: string | null
         }
         Update: {
@@ -184,20 +227,53 @@ export type Database = {
           content?: string | null
           created_at?: string
           id?: string
+          name?: string | null
+          phone_last4?: string | null
           role?: string | null
-          stage?: number
           student_id?: string
+          student_number?: string | null
           user_message?: string | null
         }
-        Relationships: [
-          {
-            foreignKeyName: "reflection_messages_student_id_fkey"
-            columns: ["student_id"]
-            isOneToOne: false
-            referencedRelation: "students"
-            referencedColumns: ["id"]
-          },
-        ]
+        Relationships: []
+      }
+      reflection_2_chat: {
+        Row: {
+          assistant_message: string | null
+          content: string | null
+          created_at: string
+          id: string
+          name: string | null
+          phone_last4: string | null
+          role: string | null
+          student_id: string
+          student_number: string | null
+          user_message: string | null
+        }
+        Insert: {
+          assistant_message?: string | null
+          content?: string | null
+          created_at?: string
+          id?: string
+          name?: string | null
+          phone_last4?: string | null
+          role?: string | null
+          student_id: string
+          student_number?: string | null
+          user_message?: string | null
+        }
+        Update: {
+          assistant_message?: string | null
+          content?: string | null
+          created_at?: string
+          id?: string
+          name?: string | null
+          phone_last4?: string | null
+          role?: string | null
+          student_id?: string
+          student_number?: string | null
+          user_message?: string | null
+        }
+        Relationships: []
       }
       reflection_notes: {
         Row: {
@@ -237,8 +313,11 @@ export type Database = {
           content: string | null
           created_at: string
           id: string
+          name: string | null
+          phone_last4: string | null
           role: string | null
           student_id: string
+          student_number: string | null
           user_message: string | null
         }
         Insert: {
@@ -246,8 +325,11 @@ export type Database = {
           content?: string | null
           created_at?: string
           id?: string
+          name?: string | null
+          phone_last4?: string | null
           role?: string | null
           student_id: string
+          student_number?: string | null
           user_message?: string | null
         }
         Update: {
@@ -255,8 +337,11 @@ export type Database = {
           content?: string | null
           created_at?: string
           id?: string
+          name?: string | null
+          phone_last4?: string | null
           role?: string | null
           student_id?: string
+          student_number?: string | null
           user_message?: string | null
         }
         Relationships: []
@@ -360,45 +445,6 @@ export type Database = {
       }
     }
     Views: {
-      debate_chat_view: {
-        Row: {
-          ai_position_kr: string | null
-          assistant_message: string | null
-          created_at: string | null
-          id: string | null
-          name: string | null
-          phone_last4: string | null
-          session_id: string | null
-          stage: number | null
-          student_id: string | null
-          student_number: string | null
-          student_position_kr: string | null
-          user_message: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "debate_messages_session_id_fkey"
-            columns: ["session_id"]
-            isOneToOne: false
-            referencedRelation: "debate_sessions"
-            referencedColumns: ["id"]
-          },
-          {
-            foreignKeyName: "debate_messages_session_id_fkey"
-            columns: ["session_id"]
-            isOneToOne: false
-            referencedRelation: "debate_sessions_view"
-            referencedColumns: ["session_id"]
-          },
-          {
-            foreignKeyName: "debate_sessions_student_id_fkey"
-            columns: ["student_id"]
-            isOneToOne: false
-            referencedRelation: "students"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       debate_notes_view: {
         Row: {
           content: string | null
@@ -465,28 +511,6 @@ export type Database = {
           },
         ]
       }
-      reflection_chat_view: {
-        Row: {
-          assistant_message: string | null
-          created_at: string | null
-          id: string | null
-          name: string | null
-          phone_last4: string | null
-          stage: number | null
-          student_id: string | null
-          student_number: string | null
-          user_message: string | null
-        }
-        Relationships: [
-          {
-            foreignKeyName: "reflection_messages_student_id_fkey"
-            columns: ["student_id"]
-            isOneToOne: false
-            referencedRelation: "students"
-            referencedColumns: ["id"]
-          },
-        ]
-      }
       reflection_notes_view: {
         Row: {
           content: string | null
@@ -507,19 +531,6 @@ export type Database = {
             referencedColumns: ["id"]
           },
         ]
-      }
-      research_chat_view: {
-        Row: {
-          assistant_message: string | null
-          created_at: string | null
-          id: string | null
-          name: string | null
-          phone_last4: string | null
-          student_id: string | null
-          student_number: string | null
-          user_message: string | null
-        }
-        Relationships: []
       }
       research_memo_view: {
         Row: {
