@@ -415,22 +415,31 @@ export type Database = {
         Row: {
           created_at: string
           id: string
+          name: string | null
+          phone_last4: string | null
           responses: Json
           student_id: string
+          student_number: string | null
           survey_type: string
         }
         Insert: {
           created_at?: string
           id?: string
+          name?: string | null
+          phone_last4?: string | null
           responses: Json
           student_id: string
+          student_number?: string | null
           survey_type: string
         }
         Update: {
           created_at?: string
           id?: string
+          name?: string | null
+          phone_last4?: string | null
           responses?: Json
           student_id?: string
+          student_number?: string | null
           survey_type?: string
         }
         Relationships: [
