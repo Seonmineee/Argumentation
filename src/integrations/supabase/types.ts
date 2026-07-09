@@ -16,85 +16,73 @@ export type Database = {
     Tables: {
       debate_1_chat: {
         Row: {
-          assistant_message: string | null
-          content: string | null
           created_at: string
           id: string
+          message: string
           name: string | null
           phone_last4: string | null
-          role: string | null
+          sender: string
           session_id: string
           student_id: string
           student_number: string | null
-          user_message: string | null
         }
         Insert: {
-          assistant_message?: string | null
-          content?: string | null
           created_at?: string
           id?: string
+          message: string
           name?: string | null
           phone_last4?: string | null
-          role?: string | null
+          sender: string
           session_id: string
           student_id: string
           student_number?: string | null
-          user_message?: string | null
         }
         Update: {
-          assistant_message?: string | null
-          content?: string | null
           created_at?: string
           id?: string
+          message?: string
           name?: string | null
           phone_last4?: string | null
-          role?: string | null
+          sender?: string
           session_id?: string
           student_id?: string
           student_number?: string | null
-          user_message?: string | null
         }
         Relationships: []
       }
       debate_2_chat: {
         Row: {
-          assistant_message: string | null
-          content: string | null
           created_at: string
           id: string
+          message: string
           name: string | null
           phone_last4: string | null
-          role: string | null
+          sender: string
           session_id: string
           student_id: string
           student_number: string | null
-          user_message: string | null
         }
         Insert: {
-          assistant_message?: string | null
-          content?: string | null
           created_at?: string
           id?: string
+          message: string
           name?: string | null
           phone_last4?: string | null
-          role?: string | null
+          sender: string
           session_id: string
           student_id: string
           student_number?: string | null
-          user_message?: string | null
         }
         Update: {
-          assistant_message?: string | null
-          content?: string | null
           created_at?: string
           id?: string
+          message?: string
           name?: string | null
           phone_last4?: string | null
-          role?: string | null
+          sender?: string
           session_id?: string
           student_id?: string
           student_number?: string | null
-          user_message?: string | null
         }
         Relationships: []
       }
