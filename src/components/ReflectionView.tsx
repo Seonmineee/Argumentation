@@ -41,16 +41,15 @@ export function ReflectionView({
     (async () => {
       const { data: dmsgs } = await supabase
         .from(debateTable)
-        .select("user_message,assistant_message")
+        .select("sender,message")
         .eq("student_id", student.id)
         .order("created_at");
       const list: { role: string; content: string }[] = [];
-      for (const m of (dmsgs ?? []) as Array<{
-        user_message: string | null;
-        assistant_message: string | null;
-      }>) {
-        if (m.user_message) list.push({ role: "user", content: m.user_message });
-        if (m.assistant_message) list.push({ role: "assistant", content: m.assistant_message });
+      for (const m of (dmsgs ?? []) as Array<{ sender: string; message: string }>) {
+        list.push({
+          role: m.sender === "user" ? "user" : "assistant",
+          content: m.message,
+        });
       }
       if (list.length === 0) {
         setLoaded(true);
@@ -67,16 +66,12 @@ export function ReflectionView({
       if (stage === 4) {
         const { data: prev } = await supabase
           .from("debate_1_chat")
-          .select("user_message,assistant_message")
+          .select("sender,message")
           .eq("student_id", student.id)
           .order("created_at");
         const prevList: string[] = [];
-        for (const m of (prev ?? []) as Array<{
-          user_message: string | null;
-          assistant_message: string | null;
-        }>) {
-          if (m.user_message) prevList.push(`[학생] ${m.user_message}`);
-          if (m.assistant_message) prevList.push(`[AI] ${m.assistant_message}`);
+        for (const m of (prev ?? []) as Array<{ sender: string; message: string }>) {
+          prevList.push(`${m.sender === "user" ? "[학생]" : "[AI]"} ${m.message}`);
         }
         if (prevList.length > 0) setPrevTranscript(prevList.join("\n\n"));
       }

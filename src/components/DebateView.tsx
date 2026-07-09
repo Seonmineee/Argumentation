@@ -47,20 +47,22 @@ export function DebateView({
       }
 
       const { data: msgs } = await supabase.from(chatTable)
-        .select("user_message,assistant_message").eq("session_id", sid!).order("created_at");
+        .select("sender,message").eq("session_id", sid!).order("created_at");
 
       setSessionId(sid!);
       const expanded: ChatMsg[] = [];
-      for (const m of (msgs ?? []) as Array<{ user_message: string | null; assistant_message: string | null }>) {
-        if (m.user_message) expanded.push({ role: "user", content: m.user_message });
-        if (m.assistant_message) expanded.push({ role: "assistant", content: m.assistant_message });
+      for (const m of (msgs ?? []) as Array<{ sender: string; message: string }>) {
+        expanded.push({
+          role: m.sender === "user" ? "user" : "assistant",
+          content: m.message,
+        });
       }
       setMessages(expanded);
       setLoaded(true);
     })();
   }, [student.id, stage, studentPosition, chatTable]);
 
-  const callAI = useCallback(async (history: ChatMsg[], sid: string, userText: string | null) => {
+  const callAI = useCallback(async (history: ChatMsg[], sid: string) => {
     setStreaming(true);
     setMessages((prev) => [...prev, { role: "assistant", content: "" }]);
     let acc = "";
@@ -84,8 +86,8 @@ export function DebateView({
             student_number: student.student_number ?? null,
             name: student.name ?? null,
             phone_last4: student.phone_last4 ?? null,
-            user_message: userText,
-            assistant_message: acc,
+            sender: "ai",
+            message: acc,
           });
         }
       },
@@ -104,7 +106,6 @@ export function DebateView({
     callAI(
       [{ role: "user", content: "토론을 시작해 주세요. 입장과 핵심 근거 2개를 제시해 주세요." }],
       sessionId,
-      null,
     );
   }, [loaded, sessionId, messages.length, callAI]);
 
@@ -113,7 +114,16 @@ export function DebateView({
     const userMsg: ChatMsg = { role: "user", content: text };
     const next = [...messages, userMsg];
     setMessages(next);
-    await callAI(next, sessionId, text);
+    await supabase.from(chatTable).insert({
+      session_id: sessionId,
+      student_id: student.id,
+      student_number: student.student_number ?? null,
+      name: student.name ?? null,
+      phone_last4: student.phone_last4 ?? null,
+      sender: "user",
+      message: text,
+    });
+    await callAI(next, sessionId);
   }
 
   async function endDebate() {
