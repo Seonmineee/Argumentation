@@ -54,6 +54,8 @@ type ChatRow = {
   stage: number | "";
   turn_index: number;
   created_at: string;
+  sender?: "user" | "ai" | "";
+  message?: string;
   user_message: string;
   assistant_message: string;
 };
@@ -72,6 +74,8 @@ function toCSV(rows: ChatRow[]): string {
     "stage",
     "turn_index",
     "created_at",
+    "sender",
+    "message",
     "user_message",
     "assistant_message",
   ];
@@ -85,6 +89,8 @@ function toCSV(rows: ChatRow[]): string {
         r.stage,
         r.turn_index,
         r.created_at,
+        r.sender ?? "",
+        r.message ?? "",
         r.user_message,
         r.assistant_message,
       ]
@@ -276,8 +282,8 @@ async function loadAll(): Promise<Row[]> {
     supabase.from("research_memo").select("student_id"),
     supabase.from("research_chat").select("student_id,user_message"),
     supabase.from("debate_sessions").select("id,student_id,stage,status"),
-    supabase.from("debate_1_chat").select("student_id,user_message"),
-    supabase.from("debate_2_chat").select("student_id,user_message"),
+    supabase.from("debate_1_chat").select("student_id,sender"),
+    supabase.from("debate_2_chat").select("student_id,sender"),
     supabase.from("reflection_notes").select("student_id,stage"),
     supabase.from("reflection_1_chat").select("student_id,user_message"),
     supabase.from("reflection_2_chat").select("student_id,user_message"),
@@ -313,13 +319,13 @@ async function loadAll(): Promise<Row[]> {
 
   // (student_id, stage) -> turn count
   const debateTurnMap = new Map<string, number>();
-  for (const m of (debate1ChatRes.data ?? []) as Array<{ student_id: string; user_message: string | null }>) {
-    if (!m.user_message || !m.user_message.trim()) continue;
+  for (const m of (debate1ChatRes.data ?? []) as Array<{ student_id: string; sender: string | null }>) {
+    if (m.sender !== "user") continue;
     const k = `${m.student_id}::3`;
     debateTurnMap.set(k, (debateTurnMap.get(k) ?? 0) + 1);
   }
-  for (const m of (debate2ChatRes.data ?? []) as Array<{ student_id: string; user_message: string | null }>) {
-    if (!m.user_message || !m.user_message.trim()) continue;
+  for (const m of (debate2ChatRes.data ?? []) as Array<{ student_id: string; sender: string | null }>) {
+    if (m.sender !== "user") continue;
     const k = `${m.student_id}::4`;
     debateTurnMap.set(k, (debateTurnMap.get(k) ?? 0) + 1);
   }
