@@ -117,11 +117,11 @@ async function fetchAllChatRows(): Promise<ChatRow[]> {
         .order("created_at", { ascending: true }),
       supabase
         .from("debate_1_chat")
-        .select("student_id,student_number,name,created_at,user_message,assistant_message")
+        .select("student_id,student_number,name,created_at,sender,message")
         .order("created_at", { ascending: true }),
       supabase
         .from("debate_2_chat")
-        .select("student_id,student_number,name,created_at,user_message,assistant_message")
+        .select("student_id,student_number,name,created_at,sender,message")
         .order("created_at", { ascending: true }),
       supabase
         .from("reflection_1_chat")
@@ -167,7 +167,7 @@ async function fetchAllChatRows(): Promise<ChatRow[]> {
     });
   }
 
-  const pushStageRows = (
+  const pushPairedStageRows = (
     data: Array<{
       student_id: string;
       student_number: string | null;
@@ -198,10 +198,44 @@ async function fetchAllChatRows(): Promise<ChatRow[]> {
     }
   };
 
-  pushStageRows(debate1Res.data as any, "debate_chat_1", 3, "debate::3");
-  pushStageRows(debate2Res.data as any, "debate_chat_2", 4, "debate::4");
-  pushStageRows(refl1Res.data as any, "reflection_chat_1", 3, "reflection::3");
-  pushStageRows(refl2Res.data as any, "reflection_chat_2", 4, "reflection::4");
+  const pushSenderStageRows = (
+    data: Array<{
+      student_id: string;
+      student_number: string | null;
+      name: string | null;
+      created_at: string;
+      sender: string | null;
+      message: string | null;
+    }> | null | undefined,
+    chatbot: ChatRow["chatbot"],
+    stage: number,
+    turnKey: string,
+  ) => {
+    for (const r of data ?? []) {
+      const st = studentMap.get(r.student_id) ?? {
+        student_number: r.student_number ?? "",
+        name: r.name ?? "",
+      };
+      const isUser = r.sender === "user";
+      rows.push({
+        student_number: st.student_number,
+        name: st.name,
+        chatbot,
+        stage,
+        turn_index: nextTurn(`${r.student_id}::${turnKey}`),
+        created_at: r.created_at,
+        sender: (r.sender ?? "") as "user" | "ai" | "",
+        message: r.message ?? "",
+        user_message: isUser ? (r.message ?? "") : "",
+        assistant_message: !isUser ? (r.message ?? "") : "",
+      });
+    }
+  };
+
+  pushSenderStageRows(debate1Res.data as any, "debate_chat_1", 3, "debate::3");
+  pushSenderStageRows(debate2Res.data as any, "debate_chat_2", 4, "debate::4");
+  pushPairedStageRows(refl1Res.data as any, "reflection_chat_1", 3, "reflection::3");
+  pushPairedStageRows(refl2Res.data as any, "reflection_chat_2", 4, "reflection::4");
 
   const chatOrder: Record<ChatRow["chatbot"], number> = {
     research_chat: 0,
