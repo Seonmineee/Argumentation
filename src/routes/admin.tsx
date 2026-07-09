@@ -252,7 +252,10 @@ async function fetchAllChatRows(): Promise<ChatRow[]> {
   };
   rows.sort((a, b) => {
     if (a.student_number !== b.student_number)
-      return a.student_number.localeCompare(b.student_number);
+      return a.student_number.localeCompare(b.student_number, undefined, {
+        numeric: true,
+        sensitivity: "base",
+      });
     if (a.chatbot !== b.chatbot) return chatOrder[a.chatbot] - chatOrder[b.chatbot];
     const sa = a.stage === "" ? -1 : a.stage;
     const sb = b.stage === "" ? -1 : b.stage;
