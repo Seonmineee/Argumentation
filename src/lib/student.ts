@@ -30,7 +30,23 @@ export function setStudent(s: StudentSession | null) {
 export function useStudent() {
   const [student, setS] = useState<StudentSession | null>(null);
   useEffect(() => {
-    setS(getStudent());
+    const current = getStudent();
+    setS(current);
+    // Validate that the stored student still exists in the DB.
+    // If not (e.g. DB was reset), clear the stale session.
+    if (current) {
+      supabase
+        .from("students")
+        .select("id")
+        .eq("id", current.id)
+        .maybeSingle()
+        .then(({ data }) => {
+          if (!data) {
+            setStudent(null);
+            setS(null);
+          }
+        });
+    }
     const onChange = () => setS(getStudent());
     window.addEventListener("student-changed", onChange);
     return () => window.removeEventListener("student-changed", onChange);
