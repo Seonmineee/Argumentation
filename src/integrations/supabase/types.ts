@@ -160,19 +160,28 @@ export type Database = {
         Row: {
           content: string
           id: string
+          name: string | null
+          phone_last4: string | null
           student_id: string
+          student_number: string | null
           updated_at: string
         }
         Insert: {
           content: string
           id?: string
+          name?: string | null
+          phone_last4?: string | null
           student_id: string
+          student_number?: string | null
           updated_at?: string
         }
         Update: {
           content?: string
           id?: string
+          name?: string | null
+          phone_last4?: string | null
           student_id?: string
+          student_number?: string | null
           updated_at?: string
         }
         Relationships: [
